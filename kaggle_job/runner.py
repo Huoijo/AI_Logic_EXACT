@@ -1,65 +1,116 @@
-# ---------------------------------------------------------------------
-# Export artifacts to Kaggle downloadable output.
-# IMPORTANT:
-# Kaggle CLI can only download files that are exposed as kernel outputs.
-# So we explicitly copy everything to /kaggle/working/outputs and create
-# /kaggle/working/exact_artifacts.zip.
-# ---------------------------------------------------------------------
 import os
 import shutil
 import subprocess
 from pathlib import Path
 
-KAGGLE_WORKING = Path("/kaggle/working")
-KAGGLE_OUTPUTS = KAGGLE_WORKING / "outputs"
-KAGGLE_ZIP = KAGGLE_WORKING / "exact_artifacts.zip"
 
-KAGGLE_OUTPUTS.mkdir(parents=True, exist_ok=True)
+REPO_URL = os.environ.get("REPO_URL", "https://github.com/Huoijo/AI_Logic_EXACT.git")
+TASK = os.environ.get("TASK", "batch")
+INPUT_MODE = os.environ.get("INPUT_MODE", "auto")
+BATCH_SIZE = os.environ.get("BATCH_SIZE", "0")
+LIMIT = os.environ.get("LIMIT", "")
+RUN_ID = os.environ.get("RUN_ID", "")
+MODEL_NAME = os.environ.get("MODEL_NAME", "Qwen/Qwen3-8B")
+DATASET = os.environ.get("DATASET", "data/fraction_dataset.json")
+LOG_EACH_CASE = os.environ.get("LOG_EACH_CASE", "1")
 
-# OUT_DIR should already exist in runner.py.
-# It may be a string or Path depending on your current code.
-src_out = Path(OUT_DIR)
+WORK_DIR = Path("/kaggle/working")
+REPO_DIR = WORK_DIR / "AI_Logic_EXACT"
+OUT_DIR = WORK_DIR / "outputs"
+ZIP_PATH = WORK_DIR / "exact_artifacts.zip"
 
-print(f"[artifact] src_out = {src_out}")
-print(f"[artifact] src_out exists = {src_out.exists()}")
 
-if src_out.exists():
-    for item in src_out.iterdir():
-        dest = KAGGLE_OUTPUTS / item.name
-        if item.is_dir():
-            if dest.exists():
-                shutil.rmtree(dest)
-            shutil.copytree(item, dest)
-        else:
-            shutil.copy2(item, dest)
+def run(cmd, cwd=None, env=None):
+    print("RUN:", " ".join(map(str, cmd)), flush=True)
+    subprocess.run(cmd, cwd=cwd, env=env, check=True)
 
-# Always write run marker.
-run_id = os.environ.get("RUN_ID", "")
-(KAGGLE_OUTPUTS / "run_id.txt").write_text(run_id, encoding="utf-8")
 
-# Debug listing before zip.
-print("[artifact] files prepared in /kaggle/working/outputs:")
-subprocess.run(
-    "find /kaggle/working/outputs -maxdepth 4 -type f -print",
-    shell=True,
-    check=False,
-)
+def run_shell(cmd, cwd=None):
+    print("RUN:", cmd, flush=True)
+    subprocess.run(cmd, cwd=cwd, shell=True, check=True)
 
-# Create zip at exact Kaggle working root.
-if KAGGLE_ZIP.exists():
-    KAGGLE_ZIP.unlink()
 
-subprocess.run(
-    "cd /kaggle/working/outputs && zip -r /kaggle/working/exact_artifacts.zip .",
-    shell=True,
-    check=True,
-)
+def main():
+    print("=" * 70, flush=True)
+    print("EXACT Kaggle Runtime", flush=True)
+    print(f"TASK={TASK}", flush=True)
+    print(f"MODEL_NAME={MODEL_NAME}", flush=True)
+    print(f"INPUT_MODE={INPUT_MODE}", flush=True)
+    print(f"DATASET={DATASET}", flush=True)
+    print(f"BATCH_SIZE={BATCH_SIZE}", flush=True)
+    print(f"LIMIT={LIMIT}", flush=True)
+    print(f"LOG_EACH_CASE={LOG_EACH_CASE}", flush=True)
+    print(f"RUN_ID={RUN_ID}", flush=True)
+    print("=" * 70, flush=True)
 
-print("[artifact] final files in /kaggle/working:")
-subprocess.run(
-    "find /kaggle/working -maxdepth 3 -type f -print",
-    shell=True,
-    check=False,
-)
+    if REPO_DIR.exists():
+        shutil.rmtree(REPO_DIR)
 
-print(f"DONE: {KAGGLE_ZIP}")
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
+
+    run(["git", "clone", "--depth", "1", REPO_URL, str(REPO_DIR)])
+
+    req_kaggle = REPO_DIR / "requirements_kaggle.txt"
+    req_local = REPO_DIR / "requirements.txt"
+
+    if req_kaggle.exists():
+        run(["python", "-m", "pip", "install", "-q", "-r", str(req_kaggle)])
+    elif req_local.exists():
+        run(["python", "-m", "pip", "install", "-q", "-r", str(req_local)])
+
+    dataset_path = REPO_DIR / DATASET
+    if not dataset_path.exists():
+        raise FileNotFoundError(
+            f"Dataset not found: {dataset_path}. "
+            f"Make sure `{DATASET}` is committed and pushed to GitHub."
+        )
+
+    env = os.environ.copy()
+    env["MODEL_NAME"] = MODEL_NAME
+    env["RUN_ID"] = RUN_ID
+    env["INPUT_MODE"] = INPUT_MODE
+    env["LOG_EACH_CASE"] = LOG_EACH_CASE
+
+    cmd = [
+        "python",
+        str(REPO_DIR / "scripts" / "kaggle_core_runner.py"),
+        "--task",
+        TASK,
+        "--dataset",
+        str(dataset_path),
+        "--input-mode",
+        INPUT_MODE,
+        "--out",
+        str(OUT_DIR),
+    ]
+
+    if BATCH_SIZE and str(BATCH_SIZE) != "0":
+        cmd += ["--batch-size", str(BATCH_SIZE)]
+
+    if LIMIT:
+        cmd += ["--limit", str(LIMIT)]
+
+    if str(LOG_EACH_CASE) == "1":
+        cmd += ["--log-cases"]
+
+    run(cmd, cwd=REPO_DIR, env=env)
+
+    # Always write run marker for stale artifact checking.
+    (OUT_DIR / "run_id.txt").write_text(RUN_ID, encoding="utf-8")
+
+    print("[artifact] files prepared in /kaggle/working/outputs:", flush=True)
+    run_shell("find /kaggle/working/outputs -maxdepth 5 -type f -print")
+
+    if ZIP_PATH.exists():
+        ZIP_PATH.unlink()
+
+    run_shell("cd /kaggle/working/outputs && zip -r /kaggle/working/exact_artifacts.zip .")
+
+    print("[artifact] final files in /kaggle/working:", flush=True)
+    run_shell("find /kaggle/working -maxdepth 3 -type f -print")
+
+    print(f"DONE: {ZIP_PATH}", flush=True)
+
+
+if __name__ == "__main__":
+    main()
