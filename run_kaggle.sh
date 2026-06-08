@@ -9,9 +9,10 @@ set -euo pipefail
 #   ./run_kaggle.sh translate
 #
 # Optional env examples:
-#   INPUT_MODE=nl DATASET=data/full_dataset.json MODEL_NAME="Qwen/Qwen3-0.6B" LIMIT=50 BATCH_SIZE=16 ./run_kaggle.sh benchmark
+#   INPUT_MODE=nl DATASET=data/full_data.json MODEL_NAME="Qwen/Qwen3-0.6B" LIMIT=50 BATCH_SIZE=16 ./run_kaggle.sh benchmark
 #   LOG_EACH_CASE=0 ./run_kaggle.sh benchmark
 #   KERNEL="yourname/exact-kaggle-core-xai" REPO_URL="https://github.com/you/repo.git" ./run_kaggle.sh batch_nl
+#   MAX_ATTEMPTS=120 SLEEP_SECONDS=20 ./run_kaggle.sh benchmark
 
 TASK="${1:-batch}"
 INPUT_MODE="${INPUT_MODE:-auto}"
@@ -76,17 +77,17 @@ finish_success() {
   printf '\a' || true
 }
 
+cleanup() {
+  rm -rf "$BUILD_DIR"
+}
+
 trap finish_fail ERR
+trap cleanup EXIT
 
 if ! command -v kaggle >/dev/null 2>&1; then
   echo "Kaggle CLI not found. Install with: pip install kaggle"
   exit 1
 fi
-
-cleanup() {
-  rm -rf "$BUILD_DIR"
-}
-trap cleanup EXIT
 
 KAGGLE_URL="https://www.kaggle.com/code/${KERNEL}"
 
@@ -156,16 +157,13 @@ replacements = {
 }
 
 for key, val in replacements.items():
-    # KEY = os.environ.get("KEY", "...")
     pattern_env = rf'{key}\s*=\s*os\.environ\.get\("{key}",\s*"[^"]*"\)'
     repl_env = f'{key} = os.environ.get("{key}", "{val}")'
-    # KEY = "..."
     pattern_plain = rf'{key}\s*=\s*"[^"]*"'
-    repl_plain = repl_env
     if re.search(pattern_env, s):
         s = re.sub(pattern_env, repl_env, s)
     elif re.search(pattern_plain, s):
-        s = re.sub(pattern_plain, repl_plain, s)
+        s = re.sub(pattern_plain, repl_env, s)
     else:
         insert_after = "from pathlib import Path\n"
         if insert_after in s:
@@ -178,13 +176,12 @@ runner.write_text(s)
 metadata_path = Path(".kaggle_build/kernel-metadata.json")
 metadata = json.loads(metadata_path.read_text())
 metadata["id"] = os.environ.get("KERNEL", metadata.get("id", ""))
-# Public avoids some CLI output permission issues. Change to "true" if you explicitly want private.
-metadata.setdefault("is_private", "false")
+# Force public so the CLI can retrieve outputs more reliably.
+metadata["is_private"] = "false"
 metadata_path.write_text(json.dumps(metadata, indent=2))
 PY_PATCH
 
 echo "[$(elapsed)] [3/5] Push Kaggle kernel"
-
 PUSH_LOG="$(mktemp)"
 if ! kaggle kernels push -p "$BUILD_DIR" --accelerator NvidiaTeslaT4 2>&1 | tee "$PUSH_LOG"; then
   echo "[$(elapsed)] [error] Kaggle kernel push failed. Not waiting for artifact."
@@ -198,13 +195,24 @@ if grep -Eiq "Kernel push error|Maximum .* session count|Permission .* denied|er
   exit 1
 fi
 
+has_expected_output() {
+  # Accept real artifact files only. Do NOT accept the downloaded .log alone.
+  find "$OUT_DIR" -type f \( \
+    -name "answers.json" -o \
+    -name "answers.partial.json" -o \
+    -name "eval_report.json" -o \
+    -name "qa_report.md" -o \
+    -name "case_timings.json" -o \
+    -name "batch_reports.json" -o \
+    -name "run_id.txt" \
+  \) | grep -q .
+}
+
 echo "[$(elapsed)] [4/5] Wait for Kaggle artifact"
 mkdir -p "$OUT_DIR" "$ART_DIR"
 
 ATTEMPT=0
-MAX_ATTEMPTS="${MAX_ATTEMPTS:-90}"
-SLEEP_SECONDS="${SLEEP_SECONDS:-20}"
-
+DOWNLOAD_MODE=""
 while true; do
   ATTEMPT=$((ATTEMPT + 1))
   echo "[$(elapsed)] Trying to download ${ARTIFACT_ZIP}... attempt ${ATTEMPT}/${MAX_ATTEMPTS}"
@@ -212,7 +220,7 @@ while true; do
   rm -rf "${OUT_DIR:?}/"*
   mkdir -p "$OUT_DIR"
 
-  # 1) Try the preferred zip artifact first
+  # 1) Preferred: a single zip artifact at Kaggle output root.
   kaggle kernels output "$KERNEL" \
     -p "$OUT_DIR" \
     -o \
@@ -224,25 +232,47 @@ while true; do
     break
   fi
 
-  # 2) Fallback: try raw outputs folder
+  # 2) Fallback: raw files under outputs/.
   echo "[$(elapsed)] Zip not found; trying raw outputs/* fallback..."
   kaggle kernels output "$KERNEL" \
     -p "$OUT_DIR" \
     -o \
     --file-pattern '^outputs/.*' || true
 
-  if find "$OUT_DIR" -type f | grep -q .; then
+  if has_expected_output; then
     echo "[$(elapsed)] [ok] Raw outputs downloaded:"
-    find "$OUT_DIR" -maxdepth 4 -type f
+    find "$OUT_DIR" -maxdepth 5 -type f
     DOWNLOAD_MODE="raw"
     break
   fi
 
+  # 3) Debug fallback: download everything, but still only accept real artifact files.
+  echo "[$(elapsed)] No artifact files yet; trying full-output probe..."
+  kaggle kernels output "$KERNEL" -p "$OUT_DIR" -o || true
+
+  if [ -f "${OUT_DIR}/${ARTIFACT_ZIP}" ]; then
+    echo "[$(elapsed)] [ok] ${ARTIFACT_ZIP} downloaded by full-output probe."
+    DOWNLOAD_MODE="zip"
+    break
+  fi
+
+  if has_expected_output; then
+    echo "[$(elapsed)] [ok] Raw outputs downloaded by full-output probe:"
+    find "$OUT_DIR" -maxdepth 5 -type f
+    DOWNLOAD_MODE="raw"
+    break
+  fi
+
+  echo "[$(elapsed)] Current downloaded files, if any:"
+  find "$OUT_DIR" -maxdepth 5 -type f || true
+
   if [ "$ATTEMPT" -ge "$MAX_ATTEMPTS" ]; then
     echo "[$(elapsed)] [error] Could not download artifact after ${MAX_ATTEMPTS} attempts."
+    echo "Open Kaggle web page and inspect the Output tab:"
+    echo "  $KAGGLE_URL"
     echo "Debug manually with:"
     echo "  kaggle kernels output $KERNEL -p kaggle_outputs/debug -o"
-    echo "  find kaggle_outputs/debug -maxdepth 4 -type f"
+    echo "  find kaggle_outputs/debug -maxdepth 5 -type f"
     exit 1
   fi
 
@@ -260,7 +290,18 @@ else
   if [ -d "${OUT_DIR}/outputs" ]; then
     cp -R "${OUT_DIR}/outputs/." "$ART_DIR/"
   else
-    cp -R "${OUT_DIR}/." "$ART_DIR/"
+    # Copy only expected artifact files, not Kaggle logs.
+    while IFS= read -r file; do
+      cp "$file" "$ART_DIR/"
+    done < <(find "$OUT_DIR" -type f \( \
+      -name "answers.json" -o \
+      -name "answers.partial.json" -o \
+      -name "eval_report.json" -o \
+      -name "qa_report.md" -o \
+      -name "case_timings.json" -o \
+      -name "batch_reports.json" -o \
+      -name "run_id.txt" \
+    \))
   fi
 fi
 
@@ -284,47 +325,6 @@ fi
 
 if [ -f "${ART_DIR}/qa_report.md" ]; then
   echo "[$(elapsed)] QA report ready: ${ART_DIR}/qa_report.md"
-fi
-
-trap - ERR
-finish_success
-
-  if [ "$ATTEMPT" -ge "$MAX_ATTEMPTS" ]; then
-    echo "[$(elapsed)] [error] Could not download ${ARTIFACT_ZIP} after ${MAX_ATTEMPTS} attempts."
-    echo "Open Kaggle web page to check whether the kernel failed or output file was not produced:"
-    echo "$KAGGLE_URL"
-    exit 1
-  fi
-
-  echo "[$(elapsed)] Artifact not ready yet. Sleeping ${SLEEP_SECONDS}s..."
-  sleep "$SLEEP_SECONDS"
-done
-
-echo "[$(elapsed)] [5/5] Extract artifacts"
-rm -rf "$ART_DIR"
-mkdir -p "$ART_DIR"
-unzip -o "${OUT_DIR}/${ARTIFACT_ZIP}" -d "$ART_DIR"
-
-if [ -f "${ART_DIR}/run_id.txt" ]; then
-  GOT_RUN_ID="$(cat "${ART_DIR}/run_id.txt" | tr -d '\n\r')"
-  if [ "$GOT_RUN_ID" != "$RUN_ID" ]; then
-    echo "[error] Downloaded artifact run_id=${GOT_RUN_ID}, expected ${RUN_ID}."
-    echo "This looks like a stale artifact from a previous Kaggle run."
-    exit 1
-  fi
-  echo "[$(elapsed)] [ok] run_id verified: ${GOT_RUN_ID}"
-else
-  echo "[$(elapsed)] [warn] artifacts/run_id.txt not found. Cannot verify whether artifact is stale."
-fi
-
-if [ -f "${ART_DIR}/eval_report.json" ]; then
-  echo "----- eval_report.json -----"
-  cat "${ART_DIR}/eval_report.json"
-  echo
-fi
-
-if [ -f "${ART_DIR}/qa_report.md" ]; then
-  echo "[$(elapsed)] Readable report generated: ${ART_DIR}/qa_report.md"
 fi
 
 trap - ERR
