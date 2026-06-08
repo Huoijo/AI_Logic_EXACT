@@ -1,7 +1,0 @@
-{
-  "task": "smoke",
-  "num_records": 1,
-  "num_with_gold": 1,
-  "exact_match": 1.0,
-  "model_mode": "symbolic_unit_smoke_no_llm"
-}
