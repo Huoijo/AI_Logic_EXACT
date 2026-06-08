@@ -11,6 +11,7 @@ set -euo pipefail
 # Optional env:
 #   INPUT_MODE=nl BATCH_SIZE=16 LIMIT=100 ./run_kaggle.sh benchmark
 #   RUN_ID=my_debug_run ./run_kaggle.sh batch_nl
+#   MAX_ATTEMPTS=90 SLEEP_SECONDS=20 ./run_kaggle.sh batch_nl
 
 TASK="${1:-batch}"
 INPUT_MODE="${INPUT_MODE:-auto}"
@@ -23,6 +24,59 @@ BUILD_DIR=".kaggle_build"
 OUT_DIR="kaggle_outputs"
 ART_DIR="artifacts"
 ARTIFACT_ZIP="exact_artifacts.zip"
+
+MAX_ATTEMPTS="${MAX_ATTEMPTS:-90}"
+SLEEP_SECONDS="${SLEEP_SECONDS:-20}"
+
+START_TS="$(date +%s)"
+
+format_duration() {
+  local total="$1"
+  local h=$((total / 3600))
+  local m=$(((total % 3600) / 60))
+  local s=$((total % 60))
+
+  if [ "$h" -gt 0 ]; then
+    printf "%02dh:%02dm:%02ds" "$h" "$m" "$s"
+  else
+    printf "%02dm:%02ds" "$m" "$s"
+  fi
+}
+
+elapsed() {
+  local now
+  now="$(date +%s)"
+  format_duration $((now - START_TS))
+}
+
+notify_mac() {
+  local title="$1"
+  local message="$2"
+
+  if command -v osascript >/dev/null 2>&1; then
+    osascript -e "display notification \"$message\" with title \"$title\"" >/dev/null 2>&1 || true
+  fi
+}
+
+finish_success() {
+  local e
+  e="$(elapsed)"
+  echo
+  echo "✅ Done in $e. Check ${ART_DIR}/"
+  notify_mac "EXACT Kaggle finished" "Task ${TASK} completed in ${e}."
+  printf '\a' || true
+}
+
+finish_fail() {
+  local e
+  e="$(elapsed)"
+  echo
+  echo "❌ Failed after $e."
+  notify_mac "EXACT Kaggle failed" "Task ${TASK} failed after ${e}."
+  printf '\a' || true
+}
+
+trap finish_fail ERR
 
 if ! command -v kaggle >/dev/null 2>&1; then
   echo "Kaggle CLI not found. Install with: pip install kaggle"
@@ -42,9 +96,10 @@ echo "BATCH_SIZE = $BATCH_SIZE"
 echo "LIMIT      = ${LIMIT:-<none>}"
 echo "RUN_ID     = $RUN_ID"
 echo "KERNEL     = $KERNEL"
+echo "START      = $(date '+%Y-%m-%d %H:%M:%S')"
 echo "======================================"
 
-echo "[0/5] Ensure generated files are ignored"
+echo "[$(elapsed)] [0/5] Ensure generated files are ignored"
 touch .gitignore
 
 grep -qxF "artifacts/" .gitignore || echo "artifacts/" >> .gitignore
@@ -54,12 +109,12 @@ grep -qxF "*.zip" .gitignore || echo "*.zip" >> .gitignore
 
 git rm -r --cached artifacts kaggle_outputs .kaggle_build 2>/dev/null || true
 
-echo "[1/5] Commit and push current repo"
+echo "[$(elapsed)] [1/5] Commit and push current repo"
 git add .
 git commit -m "kaggle-core ${TASK}" || true
 git push
 
-echo "[2/5] Build temporary Kaggle job folder"
+echo "[$(elapsed)] [2/5] Build temporary Kaggle job folder"
 rm -rf "$BUILD_DIR"
 mkdir -p "$BUILD_DIR"
 
@@ -88,14 +143,12 @@ replacements = {
 }
 
 for key, val in replacements.items():
-    # Replace existing: KEY = os.environ.get("KEY", "...")
     pattern = rf'{key}\s*=\s*os\.environ\.get\("{key}",\s*"[^"]*"\)'
     replacement = f'{key} = os.environ.get("{key}", "{val}")'
 
     if re.search(pattern, s):
         s = re.sub(pattern, replacement, s)
     else:
-        # If runner.py does not define RUN_ID yet, inject after imports.
         if key == "RUN_ID":
             insert_after = "from pathlib import Path\n"
             if insert_after in s:
@@ -106,19 +159,18 @@ for key, val in replacements.items():
 p.write_text(s)
 PY_PATCH
 
-echo "[3/5] Push Kaggle kernel"
+echo "[$(elapsed)] [3/5] Push Kaggle kernel"
 kaggle kernels push -p "$BUILD_DIR" --accelerator NvidiaTeslaT4
 
-echo "[4/5] Wait for Kaggle artifact"
+echo "[$(elapsed)] [4/5] Wait for Kaggle artifact"
 mkdir -p "$OUT_DIR" "$ART_DIR"
 
 ATTEMPT=0
-MAX_ATTEMPTS="${MAX_ATTEMPTS:-90}"
-SLEEP_SECONDS="${SLEEP_SECONDS:-20}"
 
 while true; do
   ATTEMPT=$((ATTEMPT + 1))
-  echo "Trying to download ${ARTIFACT_ZIP}... attempt ${ATTEMPT}/${MAX_ATTEMPTS}"
+
+  echo "[$(elapsed)] Trying to download ${ARTIFACT_ZIP}... attempt ${ATTEMPT}/${MAX_ATTEMPTS}"
 
   rm -f "${OUT_DIR}/${ARTIFACT_ZIP}"
 
@@ -128,28 +180,27 @@ while true; do
       --file-pattern "^${ARTIFACT_ZIP}$"; then
 
     if [ -f "${OUT_DIR}/${ARTIFACT_ZIP}" ]; then
-      echo "[ok] ${ARTIFACT_ZIP} downloaded."
+      echo "[$(elapsed)] [ok] ${ARTIFACT_ZIP} downloaded."
       break
     fi
   fi
 
   if [ "$ATTEMPT" -ge "$MAX_ATTEMPTS" ]; then
-    echo "[error] Could not download ${ARTIFACT_ZIP} after ${MAX_ATTEMPTS} attempts."
+    echo "[$(elapsed)] [error] Could not download ${ARTIFACT_ZIP} after ${MAX_ATTEMPTS} attempts."
     echo "Open Kaggle web page to check whether the kernel failed or output file was not produced:"
     echo "https://www.kaggle.com/code/${KERNEL}"
     exit 1
   fi
 
+  echo "[$(elapsed)] Artifact not ready yet. Sleeping ${SLEEP_SECONDS}s..."
   sleep "$SLEEP_SECONDS"
 done
 
-echo "[5/5] Extract artifacts"
+echo "[$(elapsed)] [5/5] Extract artifacts"
 rm -rf "$ART_DIR"
 mkdir -p "$ART_DIR"
 unzip -o "${OUT_DIR}/${ARTIFACT_ZIP}" -d "$ART_DIR"
 
-# Optional stale-artifact protection.
-# This requires kaggle_job/runner.py to write outputs/run_id.txt into the zip.
 if [ -f "${ART_DIR}/run_id.txt" ]; then
   GOT_RUN_ID="$(cat "${ART_DIR}/run_id.txt" | tr -d '\n\r')"
   if [ "$GOT_RUN_ID" != "$RUN_ID" ]; then
@@ -157,14 +208,16 @@ if [ -f "${ART_DIR}/run_id.txt" ]; then
     echo "This looks like a stale artifact from a previous Kaggle run."
     exit 1
   fi
-  echo "[ok] run_id verified: ${GOT_RUN_ID}"
+  echo "[$(elapsed)] [ok] run_id verified: ${GOT_RUN_ID}"
 else
-  echo "[warn] artifacts/run_id.txt not found. Cannot verify whether artifact is stale."
+  echo "[$(elapsed)] [warn] artifacts/run_id.txt not found. Cannot verify whether artifact is stale."
 fi
 
-echo "Done. Check ${ART_DIR}/"
 if [ -f "${ART_DIR}/eval_report.json" ]; then
   echo "----- eval_report.json -----"
   cat "${ART_DIR}/eval_report.json"
   echo
 fi
+
+trap - ERR
+finish_success
