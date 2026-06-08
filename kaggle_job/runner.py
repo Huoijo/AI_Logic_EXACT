@@ -63,6 +63,9 @@ run(runner_args, env=child_env)
 
 # Only persist one file in /kaggle/working.
 # Everything else stays in /tmp and will not be downloaded as kernel output.
+# Write run marker so local script can avoid stale artifact downloads.
+run_id = os.environ.get("RUN_ID", "")
+Path(OUT_DIR, "run_id.txt").write_text(run_id)
 if FINAL_ZIP.exists():
     FINAL_ZIP.unlink()
 run(["bash", "-lc", f"cd {OUT_DIR} && zip -r {FINAL_ZIP} ."])
