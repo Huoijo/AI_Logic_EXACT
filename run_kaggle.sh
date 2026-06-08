@@ -194,7 +194,7 @@ fi
 
 if grep -Eiq "Kernel push error|Maximum .* session count|Permission .* denied|error:" "$PUSH_LOG"; then
   echo "[$(elapsed)] [error] Kaggle reported a push error. Not waiting for artifact."
-  echo "Fix the issue above, usually by stopping active Kaggle GPU sessions."
+  cat "$PUSH_LOG"
   exit 1
 fi
 
@@ -202,20 +202,92 @@ echo "[$(elapsed)] [4/5] Wait for Kaggle artifact"
 mkdir -p "$OUT_DIR" "$ART_DIR"
 
 ATTEMPT=0
+MAX_ATTEMPTS="${MAX_ATTEMPTS:-90}"
+SLEEP_SECONDS="${SLEEP_SECONDS:-20}"
+
 while true; do
   ATTEMPT=$((ATTEMPT + 1))
   echo "[$(elapsed)] Trying to download ${ARTIFACT_ZIP}... attempt ${ATTEMPT}/${MAX_ATTEMPTS}"
-  rm -f "${OUT_DIR}/${ARTIFACT_ZIP}"
 
-  if kaggle kernels output "$KERNEL" \
-      -p "$OUT_DIR" \
-      -o \
-      --file-pattern "^${ARTIFACT_ZIP}$"; then
-    if [ -f "${OUT_DIR}/${ARTIFACT_ZIP}" ]; then
-      echo "[$(elapsed)] [ok] ${ARTIFACT_ZIP} downloaded."
-      break
-    fi
+  rm -rf "${OUT_DIR:?}/"*
+  mkdir -p "$OUT_DIR"
+
+  # 1) Try the preferred zip artifact first
+  kaggle kernels output "$KERNEL" \
+    -p "$OUT_DIR" \
+    -o \
+    --file-pattern "^${ARTIFACT_ZIP}$" || true
+
+  if [ -f "${OUT_DIR}/${ARTIFACT_ZIP}" ]; then
+    echo "[$(elapsed)] [ok] ${ARTIFACT_ZIP} downloaded."
+    DOWNLOAD_MODE="zip"
+    break
   fi
+
+  # 2) Fallback: try raw outputs folder
+  echo "[$(elapsed)] Zip not found; trying raw outputs/* fallback..."
+  kaggle kernels output "$KERNEL" \
+    -p "$OUT_DIR" \
+    -o \
+    --file-pattern '^outputs/.*' || true
+
+  if find "$OUT_DIR" -type f | grep -q .; then
+    echo "[$(elapsed)] [ok] Raw outputs downloaded:"
+    find "$OUT_DIR" -maxdepth 4 -type f
+    DOWNLOAD_MODE="raw"
+    break
+  fi
+
+  if [ "$ATTEMPT" -ge "$MAX_ATTEMPTS" ]; then
+    echo "[$(elapsed)] [error] Could not download artifact after ${MAX_ATTEMPTS} attempts."
+    echo "Debug manually with:"
+    echo "  kaggle kernels output $KERNEL -p kaggle_outputs/debug -o"
+    echo "  find kaggle_outputs/debug -maxdepth 4 -type f"
+    exit 1
+  fi
+
+  echo "[$(elapsed)] Artifact not ready yet. Sleeping ${SLEEP_SECONDS}s..."
+  sleep "$SLEEP_SECONDS"
+done
+
+echo "[$(elapsed)] [5/5] Extract artifacts"
+rm -rf "$ART_DIR"
+mkdir -p "$ART_DIR"
+
+if [ "$DOWNLOAD_MODE" = "zip" ]; then
+  unzip -o "${OUT_DIR}/${ARTIFACT_ZIP}" -d "$ART_DIR"
+else
+  if [ -d "${OUT_DIR}/outputs" ]; then
+    cp -R "${OUT_DIR}/outputs/." "$ART_DIR/"
+  else
+    cp -R "${OUT_DIR}/." "$ART_DIR/"
+  fi
+fi
+
+if [ -f "${ART_DIR}/run_id.txt" ]; then
+  GOT_RUN_ID="$(cat "${ART_DIR}/run_id.txt" | tr -d '\n\r')"
+  if [ "$GOT_RUN_ID" != "$RUN_ID" ]; then
+    echo "[warn] Downloaded artifact run_id=${GOT_RUN_ID}, expected ${RUN_ID}."
+    echo "[warn] This may be a stale artifact from a previous Kaggle run."
+  else
+    echo "[$(elapsed)] [ok] run_id verified: ${GOT_RUN_ID}"
+  fi
+else
+  echo "[$(elapsed)] [warn] artifacts/run_id.txt not found. Cannot verify run_id."
+fi
+
+if [ -f "${ART_DIR}/eval_report.json" ]; then
+  echo "----- eval_report.json -----"
+  cat "${ART_DIR}/eval_report.json"
+  echo
+fi
+
+if [ -f "${ART_DIR}/qa_report.md" ]; then
+  echo "[$(elapsed)] QA report ready: ${ART_DIR}/qa_report.md"
+fi
+
+trap - ERR
+finish_success
 
   if [ "$ATTEMPT" -ge "$MAX_ATTEMPTS" ]; then
     echo "[$(elapsed)] [error] Could not download ${ARTIFACT_ZIP} after ${MAX_ATTEMPTS} attempts."
