@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+.env
+.kaggle/
+outputs/
+kaggle_outputs/
+artifacts/*.zip
+artifacts/*.tmp
+models/
+*.log

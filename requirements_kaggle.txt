@@ -1,0 +1,9 @@
+-r requirements.txt
+torch
+transformers>=4.51.0
+accelerate>=0.34.0
+bitsandbytes>=0.43.0
+sentencepiece>=0.2.0
+protobuf>=4.25.0
+kaggle>=1.6.17
+z3-solver>=4.13.0
