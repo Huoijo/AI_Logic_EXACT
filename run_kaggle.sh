@@ -57,55 +57,40 @@ PY_PATCH
 echo "[3/5] Push Kaggle kernel"
 TASK_FROM_SHELL="$TASK" INPUT_MODE="$INPUT_MODE" BATCH_SIZE="$BATCH_SIZE" LIMIT="$LIMIT" kaggle kernels push -p "$BUILD_DIR" --accelerator NvidiaTeslaT4
 
-echo "[4/5] Wait for Kaggle run"
+echo "[4/5] Wait for Kaggle artifact"
+
+mkdir -p kaggle_outputs artifacts
+
 ATTEMPT=0
 while true; do
   ATTEMPT=$((ATTEMPT + 1))
-  STATUS="$(kaggle kernels status "$KERNEL" 2>&1 || true)"
-  echo "$STATUS"
 
-  if echo "$STATUS" | grep -Eiq "complete|succeeded|success"; then
-    break
-  fi
+  echo "Trying to download exact_artifacts.zip... attempt $ATTEMPT"
 
-  if echo "$STATUS" | grep -Eiq "failed|cancel"; then
-    echo "Kaggle job failed/canceled."
-    exit 1
-  fi
+  rm -f kaggle_outputs/exact_artifacts.zip
 
-  # Kaggle status API sometimes returns 500 while the web UI is already done.
-  # If that happens, try downloading only the final artifact zip.
-  if echo "$STATUS" | grep -q "500 Server Error"; then
-    echo "[warn] status API returned 500; trying artifact download probe..."
-    rm -rf "$OUT_DIR"
-    mkdir -p "$OUT_DIR"
-    if kaggle kernels output "$KERNEL" -p "$OUT_DIR" -o -q --file-pattern '^exact_artifacts\.zip$' 2>/dev/null; then
-      if [ -f "$OUT_DIR/exact_artifacts.zip" ]; then
-        echo "[ok] exact_artifacts.zip exists. Treating run as complete."
-        break
-      fi
+  if kaggle kernels output "$KERNEL" \
+      -p kaggle_outputs \
+      -o \
+      --file-pattern '^exact_artifacts\.zip$'; then
+
+    if [ -f "kaggle_outputs/exact_artifacts.zip" ]; then
+      echo "[ok] exact_artifacts.zip downloaded."
+      break
     fi
   fi
 
-  if [ "$ATTEMPT" -ge 120 ]; then
-    echo "Waited too long. Check Kaggle web manually: https://www.kaggle.com/code/${KERNEL}"
+  if [ "$ATTEMPT" -ge 60 ]; then
+    echo "[error] Could not download exact_artifacts.zip after 60 attempts."
+    echo "Open Kaggle web page to check whether the kernel failed or output file was not produced."
     exit 1
   fi
 
-  sleep 60
+  sleep 20
 done
 
-echo "[5/5] Download only final artifact"
-rm -rf "$OUT_DIR"
-mkdir -p "$OUT_DIR" "$ART_DIR"
-
-# --file-pattern keeps the repo clone, logs, and raw /outputs files from being downloaded.
-kaggle kernels output "$KERNEL" -p "$OUT_DIR" -o -q --file-pattern '^exact_artifacts\.zip$'
-
-if [ ! -f "$OUT_DIR/exact_artifacts.zip" ]; then
-  echo "exact_artifacts.zip not found. Your Kaggle CLI may be old; try: python -m pip install -U kaggle"
-  exit 1
-fi
-
-unzip -o "$OUT_DIR/exact_artifacts.zip" -d "$ART_DIR"
-echo "Done. Downloaded only $OUT_DIR/exact_artifacts.zip and extracted to $ART_DIR/"
+echo "[5/5] Extract artifacts"
+rm -rf artifacts
+mkdir -p artifacts
+unzip -o kaggle_outputs/exact_artifacts.zip -d artifacts
+echo "Done. Check artifacts/"
