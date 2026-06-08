@@ -15,12 +15,12 @@ Main fixes included:
 
 Typical Kaggle run:
     python scripts/train_lora_nl2fol.py \
-      --data_path /kaggle/working/AI_Logic_EXACT/data/fraction_dataset.json \
+      --data_path /kaggle/working/AI_Logic_EXACT/data/full_data.json \
       --model_name Qwen/Qwen2.5-0.5B-Instruct
 
 Useful env overrides:
     MODEL_NAME=Qwen/Qwen2.5-0.5B-Instruct
-    DATA_PATH=/kaggle/working/AI_Logic_EXACT/data/fraction_dataset.json
+    DATA_PATH=/kaggle/working/AI_Logic_EXACT/data/full_data.json
     OUTPUT_DIR=/kaggle/working/AI_Logic_EXACT/outputs/lora_nl2fol
     TASK_MODE=nl2fol        # or qa
     USE_4BIT=1
@@ -439,8 +439,20 @@ def load_model(
 
 def parse_args() -> argparse.Namespace:
     repo_default = Path(__file__).resolve().parents[1] if "__file__" in globals() else Path.cwd()
+
+    # IMPORTANT:
+    # Prefer the real full dataset. The old script looked for fraction_dataset.json first,
+    # so Kaggle silently trained on only 3 records even when DATASET=data/full_data.json
+    # was passed through run_train_kaggle.sh.
+    data_env = env("DATA_PATH") or env("DATASET")
     default_data = existing_path(
-        env("DATA_PATH"),
+        data_env,
+        str(repo_default / "data" / "full_data.json"),
+        str(repo_default / "full_data.json"),
+        "/kaggle/working/AI_Logic_EXACT/data/full_data.json",
+        "/kaggle/working/AI_Logic_EXACT/full_data.json",
+        "/mnt/data/full_data.json",
+        # Fraction dataset is now only a final fallback for local smoke tests.
         str(repo_default / "data" / "fraction_dataset.json"),
         str(repo_default / "fraction_dataset.json"),
         "/kaggle/working/AI_Logic_EXACT/data/fraction_dataset.json",
@@ -449,18 +461,38 @@ def parse_args() -> argparse.Namespace:
     )
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model_name", default=env("MODEL_NAME", "Qwen/Qwen2.5-0.5B-Instruct"))
-    parser.add_argument("--data_path", default=str(default_data) if default_data else env("DATA_PATH", "data/fraction_dataset.json"))
+    parser.add_argument("--model_name", default=env("MODEL_NAME", "Qwen/Qwen2.5-7B-Instruct"))
+    parser.add_argument(
+        "--data_path",
+        default=str(default_data) if default_data else (data_env or "data/full_data.json"),
+    )
     parser.add_argument("--output_dir", default=env("OUTPUT_DIR", str(repo_default / "outputs" / "lora_nl2fol")))
     parser.add_argument("--task_mode", choices=["nl2fol", "qa"], default=env("TASK_MODE", "nl2fol"))
 
     parser.add_argument("--max_seq_length", type=int, default=int(env("MAX_SEQ_LENGTH", "2048") or 2048))
-    parser.add_argument("--num_train_epochs", type=float, default=float(env("NUM_TRAIN_EPOCHS", "3") or 3))
+    parser.add_argument(
+        "--num_train_epochs",
+        type=float,
+        default=float(env("EPOCHS", env("NUM_TRAIN_EPOCHS", "3")) or 3),
+    )
     parser.add_argument("--learning_rate", type=float, default=float(env("LEARNING_RATE", "2e-4") or 2e-4))
-    parser.add_argument("--per_device_train_batch_size", type=int, default=int(env("BATCH_SIZE", "1") or 1))
+    parser.add_argument(
+        "--per_device_train_batch_size",
+        type=int,
+        default=int(env("TRAIN_BS", env("BATCH_SIZE", "1")) or 1),
+    )
+    parser.add_argument(
+        "--per_device_eval_batch_size",
+        type=int,
+        default=int(env("EVAL_BS", "1") or 1),
+    )
     parser.add_argument("--gradient_accumulation_steps", type=int, default=int(env("GRAD_ACCUM", "8") or 8))
     parser.add_argument("--eval_ratio", type=float, default=float(env("EVAL_RATIO", "0.1") or 0.1))
     parser.add_argument("--seed", type=int, default=int(env("SEED", "42") or 42))
+
+    # Useful for smoke/mini-train runs.
+    parser.add_argument("--max_train_samples", type=int, default=int(env("MAX_TRAIN_SAMPLES", "0") or 0))
+    parser.add_argument("--max_valid_samples", type=int, default=int(env("MAX_VALID_SAMPLES", "0") or 0))
 
     parser.add_argument("--use_4bit", type=str2bool, default=str2bool(env("USE_4BIT", "1")))
     parser.add_argument("--gradient_checkpointing", type=str2bool, default=str2bool(env("GRADIENT_CHECKPOINTING", "1")))
@@ -471,7 +503,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--lora_alpha", type=int, default=int(env("LORA_ALPHA", "32") or 32))
     parser.add_argument("--lora_dropout", type=float, default=float(env("LORA_DROPOUT", "0.05") or 0.05))
     return parser.parse_args()
-
 
 def main() -> None:
     args = parse_args()
@@ -507,6 +538,18 @@ def main() -> None:
         )
 
     train_dataset, eval_dataset = train_eval_split(samples, args.eval_ratio, args.seed)
+
+    # Apply smoke/mini-train limits after the train/eval split, so validation
+    # remains separate from training and the metadata reflects the actual used samples.
+    if args.max_train_samples > 0 and len(train_dataset) > args.max_train_samples:
+        train_dataset = train_dataset.select(range(args.max_train_samples))
+    if (
+        eval_dataset is not None
+        and args.max_valid_samples > 0
+        and len(eval_dataset) > args.max_valid_samples
+    ):
+        eval_dataset = eval_dataset.select(range(args.max_valid_samples))
+
     print(f"[data] records={len(records)}, samples={len(samples)}, train={len(train_dataset)}, eval={len(eval_dataset) if eval_dataset is not None else 0}")
     print("[data] sample preview:")
     print(train_dataset[0]["text"][:1000])
@@ -544,7 +587,7 @@ def main() -> None:
         "overwrite_output_dir": True,
         "num_train_epochs": args.num_train_epochs,
         "per_device_train_batch_size": args.per_device_train_batch_size,
-        "per_device_eval_batch_size": 1,
+        "per_device_eval_batch_size": args.per_device_eval_batch_size,
         "gradient_accumulation_steps": args.gradient_accumulation_steps,
         "gradient_checkpointing": args.gradient_checkpointing,
         "learning_rate": args.learning_rate,
@@ -564,6 +607,7 @@ def main() -> None:
         "remove_unused_columns": True,
         "dataset_text_field": "text",
         "max_seq_length": args.max_seq_length,
+        "max_length": args.max_seq_length,
         "packing": False,
     }
 
@@ -595,6 +639,13 @@ def main() -> None:
         "samples": len(samples),
         "train_samples": len(train_dataset),
         "eval_samples": len(eval_dataset) if eval_dataset is not None else 0,
+        "max_train_samples": args.max_train_samples,
+        "max_valid_samples": args.max_valid_samples,
+        "num_train_epochs": args.num_train_epochs,
+        "learning_rate": args.learning_rate,
+        "per_device_train_batch_size": args.per_device_train_batch_size,
+        "per_device_eval_batch_size": args.per_device_eval_batch_size,
+        "gradient_accumulation_steps": args.gradient_accumulation_steps,
         "bf16": use_bf16,
         "fp16": use_fp16,
         "compute_dtype": str(compute_dtype),
