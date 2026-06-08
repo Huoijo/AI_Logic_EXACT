@@ -5,8 +5,8 @@ import shutil
 import subprocess
 from pathlib import Path
 
-# TODO: đổi URL repo của bạn ở đây
-REPO_URL = "https://github.com/Huoijo/AI_Logic_EXACT"
+# These defaults can be overridden from run_kaggle.sh via env/patching.
+REPO_URL = os.environ.get("REPO_URL", "https://github.com/Huoijo/AI_Logic_EXACT.git")
 BRANCH = os.environ.get("BRANCH", "main")
 TASK = os.environ.get("TASK", "batch")
 MODEL_NAME = os.environ.get("MODEL_NAME", "Qwen/Qwen3-8B")
@@ -15,6 +15,9 @@ LOAD_4BIT = os.environ.get("LOAD_4BIT", "1")
 INPUT_MODE = os.environ.get("INPUT_MODE", "auto")
 BATCH_SIZE = os.environ.get("BATCH_SIZE", "0")
 LIMIT = os.environ.get("LIMIT", "")
+DATASET = os.environ.get("DATASET", "data/fraction_dataset.json")
+RUN_ID = os.environ.get("RUN_ID", "")
+LOG_EACH_CASE = os.environ.get("LOG_EACH_CASE", "1")
 
 # Important: do NOT clone repo into /kaggle/working.
 # Kaggle persists /kaggle/working as downloadable output, so putting the repo there
@@ -30,6 +33,18 @@ def run(cmd, cwd=None, env=None):
     subprocess.run(list(map(str, cmd)), check=True, cwd=cwd, env=env)
 
 
+print("=" * 60, flush=True)
+print("EXACT Kaggle Runtime", flush=True)
+print(f"TASK={TASK}", flush=True)
+print(f"MODEL_NAME={MODEL_NAME}", flush=True)
+print(f"INPUT_MODE={INPUT_MODE}", flush=True)
+print(f"BATCH_SIZE={BATCH_SIZE}", flush=True)
+print(f"LIMIT={LIMIT or '<none>'}", flush=True)
+print(f"DATASET={DATASET}", flush=True)
+print(f"RUN_ID={RUN_ID}", flush=True)
+print(f"LOG_EACH_CASE={LOG_EACH_CASE}", flush=True)
+print("=" * 60, flush=True)
+
 if RUNTIME_DIR.exists():
     shutil.rmtree(RUNTIME_DIR)
 RUNTIME_DIR.mkdir(parents=True, exist_ok=True)
@@ -42,11 +57,17 @@ child_env = os.environ.copy()
 child_env["MODEL_NAME"] = MODEL_NAME
 child_env["USE_LLM"] = USE_LLM
 child_env["LOAD_4BIT"] = LOAD_4BIT
+child_env["PYTHONUNBUFFERED"] = "1"
+
+# Resolve dataset relative to repo unless an absolute path is provided.
+dataset_path = Path(DATASET)
+if not dataset_path.is_absolute():
+    dataset_path = REPO_DIR / dataset_path
 
 runner_args = [
-    "python", REPO_DIR / "scripts" / "kaggle_core_runner.py",
+    "python", "-u", REPO_DIR / "scripts" / "kaggle_core_runner.py",
     "--task", TASK,
-    "--dataset", REPO_DIR / "data" / "fraction_dataset.json",
+    "--dataset", dataset_path,
     "--out", OUT_DIR,
     "--input-mode", INPUT_MODE,
     "--batch-size", BATCH_SIZE,
@@ -58,14 +79,29 @@ if TASK == "batch_nl" or TASK == "translate":
 if TASK == "smoke":
     # smoke now runs a tiny unit chain and does NOT load the LLM
     child_env["USE_LLM"] = "0"
+if LOG_EACH_CASE == "1" and TASK != "smoke":
+    runner_args.append("--log-cases")
 
 run(runner_args, env=child_env)
 
+# Persist run marker so the local downloader can detect stale artifact zips.
+(OUT_DIR / "run_id.txt").write_text(RUN_ID, encoding="utf-8")
+(OUT_DIR / "runtime_config.json").write_text(
+    __import__("json").dumps({
+        "task": TASK,
+        "model_name": MODEL_NAME,
+        "input_mode": INPUT_MODE,
+        "batch_size": BATCH_SIZE,
+        "limit": LIMIT,
+        "dataset": DATASET,
+        "run_id": RUN_ID,
+        "log_each_case": LOG_EACH_CASE,
+    }, indent=2),
+    encoding="utf-8",
+)
+
 # Only persist one file in /kaggle/working.
 # Everything else stays in /tmp and will not be downloaded as kernel output.
-# Write run marker so local script can avoid stale artifact downloads.
-run_id = os.environ.get("RUN_ID", "")
-Path(OUT_DIR, "run_id.txt").write_text(run_id)
 if FINAL_ZIP.exists():
     FINAL_ZIP.unlink()
 run(["bash", "-lc", f"cd {OUT_DIR} && zip -r {FINAL_ZIP} ."])

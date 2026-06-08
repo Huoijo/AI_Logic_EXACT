@@ -187,3 +187,35 @@ The dataset loader now aligns gold answers by question type. If the JSON stores 
 ### Z3 backend
 
 `z3-solver` is optional but enabled by default when installed. It is used for finite-domain entailment checks, especially MCQ options that are implications or contraposition-like statements. The custom reasoner is still used first because it gives cleaner proof trees.
+
+## v4 additions: terminal per-case logs + readable QA report
+
+This patched version adds:
+
+- `MODEL_NAME=...` from terminal, no manual code editing.
+- `DATASET=...` from terminal, so you can run full dataset files.
+- `LOG_EACH_CASE=1` to print every question, answer, gold answer, warnings, option results, and per-case runtime to the Kaggle terminal log.
+- `case_timings.json` with runtime for every question-level case.
+- `qa_report.md`, a human-readable `Question / Answer / Gold / Explanation` report.
+- `run_id.txt` to reduce stale artifact mistakes when polling Kaggle outputs.
+- macOS notification when the local script finishes or fails.
+
+Recommended near-spec benchmark:
+
+```bash
+INPUT_MODE=nl DATASET=data/full_dataset.json MODEL_NAME="Qwen/Qwen3-0.6B" LIMIT=50 BATCH_SIZE=16 ./run_kaggle.sh benchmark
+```
+
+For less noisy terminal logs:
+
+```bash
+LOG_EACH_CASE=0 INPUT_MODE=nl DATASET=data/full_dataset.json MODEL_NAME="Qwen/Qwen3-0.6B" LIMIT=50 BATCH_SIZE=16 ./run_kaggle.sh benchmark
+```
+
+After the run finishes, check:
+
+```bash
+open artifacts/qa_report.md
+cat artifacts/eval_report.json
+cat artifacts/case_timings.json
+```
