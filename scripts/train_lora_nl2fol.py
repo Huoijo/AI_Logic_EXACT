@@ -17,6 +17,7 @@ from datasets import load_dataset
 from peft import LoraConfig, prepare_model_for_kbit_training
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig, TrainingArguments
 from trl import SFTTrainer
+from trl import SFTConfig, SFTTrainer
 
 
 def parse_args() -> argparse.Namespace:
@@ -134,16 +135,40 @@ def main() -> None:
     # TRL versions differ. Most recent versions use processing_class and max_seq_length in SFTConfig,
     # older versions accept tokenizer/max_seq_length directly. Try the compatible path first.
     try:
+
+
+        sft_args = SFTConfig(
+            output_dir=str(output_dir),
+            dataset_text_field="text",
+            max_length=max_seq_length,
+            packing=False,
+
+            per_device_train_batch_size=train_bs,
+            per_device_eval_batch_size=eval_bs,
+            gradient_accumulation_steps=grad_accum,
+
+            num_train_epochs=epochs,
+            learning_rate=learning_rate,
+            logging_steps=10,
+            save_steps=100,
+            eval_steps=100,
+            save_strategy="steps",
+            eval_strategy="steps",
+
+            fp16=True,
+            bf16=False,
+
+            warmup_steps=10,
+            report_to="none",
+        )
+
         trainer = SFTTrainer(
             model=model,
-            args=training_args,
-            train_dataset=ds["train"],
-            eval_dataset=ds["validation"],
+            args=sft_args,
+            train_dataset=train_dataset,
+            eval_dataset=valid_dataset,
+            processing_class=tokenizer,
             peft_config=peft_config,
-            dataset_text_field="text",
-            max_seq_length=args.max_seq_length,
-            tokenizer=tokenizer,
-            packing=False,
         )
     except TypeError:
         from trl import SFTConfig
