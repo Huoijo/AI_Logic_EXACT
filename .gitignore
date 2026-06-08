@@ -13,3 +13,6 @@ models/
 artifacts/
 .kaggle_build/
 *.zip
+train_artifacts/
+kaggle_train_outputs/
+.kaggle_train_build/

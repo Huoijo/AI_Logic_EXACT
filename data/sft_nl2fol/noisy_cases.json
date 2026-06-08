@@ -1,0 +1,3179 @@
+[
+  {
+    "record_id": 1,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Sophia qualifies for the university scholarship",
+      "B": "Sophia needs a faculty recommendation to qualify for the scholarship",
+      "C": "Sophia is eligible for the international program",
+      "D": "Sophia needs to pass the language proficiency exam to get an honors diploma"
+    }
+  },
+  {
+    "record_id": 2,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Sophia qualifies for the university scholarship",
+      "B": "Sophia needs a faculty recommendation to qualify for the scholarship",
+      "C": "Sophia is eligible for the international program",
+      "D": "Sophia needs to pass the language proficiency exam to get an honors diploma"
+    }
+  },
+  {
+    "record_id": 3,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "John qualifies for the graduate fellowship program",
+      "B": "John needs faculty recommendation for the fellowship",
+      "C": "John must complete an internship to qualify",
+      "D": "John’s GPA is insufficient for honors"
+    }
+  },
+  {
+    "record_id": 4,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "He can teach undergraduate courses but cannot supervise graduates",
+      "B": "He can serve on curriculum committees but cannot propose courses",
+      "C": "He can propose new courses",
+      "D": "He needs more publications to serve on committees"
+    }
+  },
+  {
+    "record_id": 5,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "He can access restricted archives but cannot submit proposals",
+      "B": "He can apply for collaborative research projects",
+      "C": "He needs more publications to access archives",
+      "D": "He is eligible for extended library access but cannot apply for projects"
+    }
+  },
+  {
+    "record_id": 6,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "John can transport hazardous materials but cannot cross state lines",
+      "B": "John can cross state lines with hazardous cargo",
+      "C": "John cannot transport hazardous materials",
+      "D": "John is not qualified to transport any kind of goods"
+    }
+  },
+  {
+    "record_id": 7,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Can teach undergraduate courses only",
+      "B": "Can be a research mentor",
+      "C": "Cannot teach graduate courses",
+      "D": "Needs additional certification to mentor"
+    }
+  },
+  {
+    "record_id": 8,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "It enhances student engagement but not critical thinking",
+      "B": "It enhances critical thinking",
+      "C": "It needs more resources to enhance critical thinking",
+      "D": "It is well-structured but lacks exercises"
+    }
+  },
+  {
+    "record_id": 9,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "It enhances student engagement but not critical thinking",
+      "B": "It enhances critical thinking",
+      "C": "It needs more resources to enhance critical thinking",
+      "D": "It is well-structured but lacks exercises"
+    }
+  },
+  {
+    "record_id": 10,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Eligible for Course C but not the internship",
+      "B": "Eligible for the internship program",
+      "C": "Needs to pass Course B first",
+      "D": "Only eligible for Course B"
+    }
+  },
+  {
+    "record_id": 11,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Alex can use equipment but cannot book training without a trainer",
+      "B": "Alex can book personal training sessions if assigned a trainer",
+      "C": "Alex needs a longer membership duration",
+      "D": "Alex must pay additional fees"
+    }
+  },
+  {
+    "record_id": 12,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "She can take advanced classes because she has approval",
+      "B": "She cannot take advanced classes due to insufficient completed courses",
+      "C": "She is eligible but lacks approval",
+      "D": "Her active status alone qualifies her"
+    }
+  },
+  {
+    "record_id": 13,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Can teach graduate courses but cannot supervise research",
+      "B": "Can supervise Master's students but not graduate research",
+      "C": "Can both teach graduate courses and supervise research",
+      "D": "Needs additional certification to supervise"
+    }
+  },
+  {
+    "record_id": 14,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "He can teach undergraduate courses",
+      "B": "He qualifies as department head but cannot teach",
+      "C": "He needs a Master's degree to teach undergraduates",
+      "D": "His PhD is insufficient for teaching"
+    }
+  },
+  {
+    "record_id": 15,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "He can prescribe medication",
+      "B": "He needs more clinical hours",
+      "C": "He isn't registered",
+      "D": "He can't prescribe without additional certification"
+    }
+  },
+  {
+    "record_id": 16,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Alex can use equipment but can't book training",
+      "B": "Alex can book personal training sessions",
+      "C": "Alex needs longer membership duration",
+      "D": "Alex must pay additional fees"
+    }
+  },
+  {
+    "record_id": 17,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Minh has met the criteria to pursue Biochemistry",
+      "B": "Minh cannot take Biochemistry without Lab Safety Certification",
+      "C": "Minh is not eligible to enroll in Organic Chemistry",
+      "D": "Minh needs to repeat Chemistry 101"
+    }
+  },
+  {
+    "record_id": 20,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "A student with low attendance, assignment completion, and professor approval can pass the course if they complete the exam.",
+      "B": "A student with less than 80% attendance who doesn’t complete the assignment can still take the exam.",
+      "C": "A student with 60% attendance and a scholarship automatically passes all courses.",
+      "D": "A student who attends every class but doesn’t complete the exam can still pass."
+    }
+  },
+  {
+    "record_id": 21,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "A student who studies >12 hours, doesn’t debate, and writes a high-quality essay in political studies can qualify for a fellowship",
+      "B": "A student studying <6 hours who avoids both debates and essays will pass",
+      "C": "Understanding ideologies without policy analysis leads to automatic recognition",
+      "D": "All students must participate in debates regardless of their study hours"
+    }
+  },
+  {
+    "record_id": 22,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "A student mastering superposition who writes an original research paper in quantum mechanics qualifies for a scholarship",
+      "B": "Limited study time (<8h) doesn’t impair superposition understanding",
+      "C": "Merely explaining quantum measurement guarantees recognition",
+      "D": "All students must analyze entanglement regardless of their expertise"
+    }
+  },
+  {
+    "record_id": 23,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "A student who develops through the quantum theory chain, from duality to advanced research preparation, can make academic contributions through publication or seminar",
+      "B": "Laboratory access is independent of publication/seminar participation",
+      "C": "Interpretation critique alone qualifies for research positions",
+      "D": "Understanding wave-particle duality guarantees lab access"
+    }
+  },
+  {
+    "record_id": 24,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Spaced repetition improves both memory and academic performance",
+      "B": "Excessively long intervals preserve knowledge without review",
+      "C": "AI cannot optimize study schedules for memory retention",
+      "D": "Passive reading is more effective than active recall"
+    }
+  },
+  {
+    "record_id": 24,
+    "question_id": 1,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Review timing has no impact on retention",
+      "B": "Optimal intervals prevent both premature review and excessive forgetting",
+      "C": "Sleep has no effect on memory consolidation",
+      "D": "All learning methods yield identical results"
+    }
+  },
+  {
+    "record_id": 25,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Spaced repetition improves both memory and academic performance",
+      "B": "Excessively long intervals preserve knowledge without review",
+      "C": "AI cannot optimize study schedules for memory retention",
+      "D": "Passive reading is more effective than active recall"
+    }
+  },
+  {
+    "record_id": 25,
+    "question_id": 1,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Review timing has no impact on retention",
+      "B": "Optimal intervals prevent both premature review and excessive forgetting",
+      "C": "Sleep has no effect on memory consolidation",
+      "D": "All learning methods yield identical results"
+    }
+  },
+  {
+    "record_id": 26,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "A quadrilateral with opposite angles summing to 180° and a perpendicular bisecting diagonal must be a cyclic trapezium",
+      "C": "Only rectangles can have opposite angles summing to 180°",
+      "D": "A quadrilateral cannot be both cyclic and have perpendicular diagonals"
+    }
+  },
+  {
+    "record_id": 26,
+    "question_id": 1,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Premises 1, 3, 7",
+      "B": "Premises 2, 5, 6",
+      "C": "Premises 4, 8",
+      "D": "Premises 1, 2, 5"
+    }
+  },
+  {
+    "record_id": 27,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Procrastination + passive review + sleep deprivation",
+      "B": "Clear deadlines + high stress",
+      "C": "Pomodoro technique + overwhelming task size",
+      "D": "Task breakdown + excessive distractions"
+    }
+  },
+  {
+    "record_id": 28,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Flawless simulations, minor trajectory tweak, routine rover check, brief signal delay",
+      "B": "Failed simulations, audit rejection, high radiation, equipment breakdown",
+      "C": "Incomplete training, miscalculated trajectory, unsafe landing, delayed return",
+      "D": "Perfect execution, instant breakthrough, permanent Mars base"
+    }
+  },
+  {
+    "record_id": 29,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "A student with 6h downtime must retake a rescheduled exam",
+      "B": "A student with 6h downtime earns a certificate despite failing courses",
+      "C": "External proctors block exam rescheduling after 6h downtime",
+      "D": "100% live attendance overrides 6h downtime effects"
+    }
+  },
+  {
+    "record_id": 30,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Structured plan + hands-on experiments + visualization",
+      "B": "Interactive tools + excessive screen time + cognitive fatigue",
+      "C": "Minimal distractions + historical perspectives + leisure overload",
+      "D": "Physical exercise + parallel subjects + scattered focus"
+    }
+  },
+  {
+    "record_id": 37,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "All students complete all assigned exercises",
+      "B": "Some students seek help from teaching assistants when needed",
+      "C": "All students have a consistent study routine",
+      "D": "Some students do not attend class regularly"
+    }
+  },
+  {
+    "record_id": 38,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "At least one student attends lectures regularly.",
+      "B": "There exists a student who attends lectures but does not complete assignments on time.",
+      "C": "All students understand the material."
+    }
+  },
+  {
+    "record_id": 39,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "At least one student graduates.",
+      "B": "Some students actively participate in class discussions but do not submit homework on time.",
+      "C": "All students fail the exams."
+    }
+  },
+  {
+    "record_id": 40,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Students who solve math problems correctly must have practiced them.",
+      "B": "Some students ask questions in math class even if they do not attend lectures.",
+      "C": "All students who practice math problems ask questions in class."
+    }
+  },
+  {
+    "record_id": 41,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Anyone with experience in their field must be hardworking.",
+      "B": "Some people are responsible but not punctual."
+    }
+  },
+  {
+    "record_id": 42,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "B": "Submitting all assignments on time never improves GPA.",
+      "C": "All students on the honor roll never have high GPAs."
+    }
+  },
+  {
+    "record_id": 43,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Attending lectures leads to performing well in exams.",
+      "B": "A student with a scholarship always has high grades.",
+      "C": "If a student does not understand the material, they cannot perform well in exams.",
+      "D": "More study time guarantees high achievement."
+    }
+  },
+  {
+    "record_id": 44,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Failing to secure an internship prevents improved job prospects.",
+      "B": "Attending lectures regularly leads to a high GPA.",
+      "C": "Financial benefits imply participation in research projects.",
+      "D": "Practical experience guarantees eligibility for academic awards."
+    }
+  },
+  {
+    "record_id": 45,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Students who do not perform well in internships will never receive full-time job offers.",
+      "B": "Having industry connections can help a student gain practical experience indirectly.",
+      "C": "Building a strong resume directly increases a student’s earning potential.",
+      "D": "Students who do not have a mentor cannot make any career decisions."
+    }
+  },
+  {
+    "record_id": 46,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Students who attend career workshops are guaranteed to get hired after interviews.",
+      "B": "Building a strong resume directly leads to financial stability.",
+      "C": "Having a career mentor leads to better long-term career growth.",
+      "D": "Gaining relevant work experience prevents the need for strong interview performance."
+    }
+  },
+  {
+    "record_id": 47,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "If a student manages their time effectively, they receive feedback on assignments.",
+      "B": "A student who uses feedback improves their grades.",
+      "C": "If a student has high academic performance, they are less likely to get job opportunities.",
+      "D": "If a student does not attend lectures, they definitely cannot understand the subject."
+    }
+  },
+  {
+    "record_id": 48,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "If a student gains academic recognition, they must have received a research grant.",
+      "B": "A student who does not publish research can still receive a research grant.",
+      "C": "If a student does not engage in independent study, they will never publish research.",
+      "D": "If a student engages in independent study, they are likely to publish research and may gain academic recognition."
+    }
+  },
+  {
+    "record_id": 49,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Engaging in research improves a student's chances of gaining academic recognition.",
+      "B": "A student who does not win an academic competition can still receive a merit award.",
+      "C": "If a student participates in academic competitions, they will receive academic recognition."
+    }
+  },
+  {
+    "record_id": 50,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "If a student maintains a high GPA, they are more likely to receive a scholarship.",
+      "B": "A student who does not maintain a high GPA can still qualify for a merit-based scholarship.",
+      "C": "If a student does not engage in extracurricular activities, they will never receive a scholarship."
+    }
+  },
+  {
+    "record_id": 51,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "If a student applies for financial aid and qualifies, they are more likely to receive support and reduce financial stress.",
+      "B": "If a student has less financial stress, they are more likely to perform better academically.",
+      "C": "If a student does not qualify for any aid and takes no counseling, they are guaranteed to take on student loans.",
+      "D": "If a student receives financial aid, their tuition burden remains the same."
+    }
+  },
+  {
+    "record_id": 52,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Practicing Python regularly always results in worse coding skills.",
+      "B": "Practicing Python regularly improves coding skills.",
+      "C": "Students who do not practice Python regularly become proficient in Python.",
+      "D": "Practicing Python has no effect on a student’s coding abilities."
+    }
+  },
+  {
+    "record_id": 54,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "A cost-effective Raspberry Pi system may fail to support all versatile use-cases if it is not thoroughly tested and well-documented.",
+      "D": "A Raspberry Pi system is necessarily versatile even if it is not cost-effective."
+    }
+  },
+  {
+    "record_id": 55,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "It is not the case that if an EV charging station being not widely available implies that it is not thoroughly maintained then every EV charging station meets safety standards.",
+      "C": "Both that if an EV charging station being not widely available implies that it is not thoroughly maintained then every EV charging station meets safety standards, and that it is not the case that if an EV charging station being not widely available implies that it is not thoroughly maintained then every EV charging station meets safety standards."
+    }
+  },
+  {
+    "record_id": 56,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "C": "Both the statement that if a microchip not being functional implies that it does not have a stable power supply then there exists at least one microchip that meets performance standards and the statement that it is not the case that if a microchip not being functional implies that it does not have a stable power supply then there exists at least one microchip that meets performance standards are true.",
+      "D": "It is not the case that if a microchip not being functional implies that it does not have a stable power supply, then there exists at least one microchip that meets performance standards."
+    }
+  },
+  {
+    "record_id": 57,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "It is false that if every transportation system in the city is safe, then there exists at least one transportation system that is cost-effective.",
+      "B": "Both (every transportation system in the city is safe implies there exists at least one cost-effective transportation system) and its negation hold, leading to a contradiction."
+    }
+  },
+  {
+    "record_id": 73,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "If a student receives a scholarship, they must be excellent."
+    }
+  },
+  {
+    "record_id": 74,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "D": "Every school has both students and teachers."
+    }
+  },
+  {
+    "record_id": 77,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "D": "If a student meets academic requirements, they are not eligible for graduation."
+    }
+  },
+  {
+    "record_id": 78,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "B": "If a student does not participate in study groups, they will fail.",
+      "C": "If a student submits assignments on time, they do not achieve good grades."
+    }
+  },
+  {
+    "record_id": 80,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "C": "If a student does not attend class, they will achieve high scores."
+    }
+  },
+  {
+    "record_id": 82,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "C": "If a student does not attend class, they receive extra credit."
+    }
+  },
+  {
+    "record_id": 86,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "If someone passes the exam, they are qualified.",
+      "C": "If someone is not a student, they take courses."
+    }
+  },
+  {
+    "record_id": 87,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "C": "If someone is not registered for the course, they pass the exam."
+    }
+  },
+  {
+    "record_id": 88,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "A person is qualified if and only if they are registered.",
+      "B": "A person is qualified only if they are not registered.",
+      "C": "A person is registered only if they do not study.",
+      "D": "A person is qualified only if they do not train."
+    }
+  },
+  {
+    "record_id": 89,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Everyone studies.",
+      "B": "Everyone is not registered.",
+      "D": "No one is qualified."
+    }
+  },
+  {
+    "record_id": 90,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "'If a student does not attend all lectures and does not participate in class discussions, they will fail the final exam and receive a low participation grade.'",
+      "B": "'If a student attends a tutoring session and completes at least 80% of the assignments, they are more likely to improve their grades and pass the course.'",
+      "C": "'Every teacher in the school has at least a doctoral degree in their subject area and provides detailed feedback on assignments.'",
+      "D": "'If a student does not complete at least 80% of the assignments and does not submit their research paper, they will fail the course and be placed on academic probation.'"
+    }
+  },
+  {
+    "record_id": 91,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "D": "If a student does not participate in extracurricular activities, they will develop leadership skills."
+    }
+  },
+  {
+    "record_id": 102,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "If a student does not follow the school rules and if a student violates the school rules, they will be disciplined and banned from extracurricular activities, and if a student does not follow the dress code, they will be asked to change their clothes.",
+      "B": "If a student does not follow the school rules and if a student violates the school rules, they will not be disciplined and banned from extracurricular activities, and if a student does not follow the dress code, they will be asked to change their clothes.",
+      "C": "If a student does not follow the school rules and if a student violates the school rules, they will be disciplined and banned from extracurricular activities, and if a student does not follow the dress code, they will not be asked to change their clothes.",
+      "D": "If a student does not follow the school rules and if a student violates the school rules, they will be disciplined and banned from extracurricular activities, and if a student does not follow the dress code, they will be asked to change their clothes in some cases but not all."
+    }
+  },
+  {
+    "record_id": 103,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "'If a student participates in extracurricular activities and completes assignments, they will receive points and gain additional points.'",
+      "B": "'If a student does not complete assignments and does not follow the attendance policy, they will lose points and lose participation points.'",
+      "C": "'If a student participates in extracurricular activities and violates the school policy on mobile phones, they will gain additional points and receive a warning.'",
+      "D": "'If a student participates in group projects and completes their final project, they will be penalized and eligible for extra participation points.'"
+    }
+  },
+  {
+    "record_id": 104,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "'If a student participates in extracurricular activities and follows the attendance policy, they will gain extra credit and be eligible for participation points.'",
+      "B": "'If a student does not complete assignments and does not follow the study plan, they will not pass the exam and not be eligible for extra credit.'",
+      "C": "'If a student participates in group projects and does not follow the attendance policy, they will gain extra credit and lose participation points.'",
+      "D": "'If a student follows the study plan and completes assignments, they will pass the exam and not be eligible for extra credit.'"
+    }
+  },
+  {
+    "record_id": 108,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "((ForAll(x, ResearchProject(x)) → (ForAll(x, Extracurricular(x)) → (Enrolled(x) → Resources(x)))) ∧ ¬(ForAll(x, ResearchProject(x)) → (ForAll(x, Extracurricular(x)) → (Enrolled(x) → Resources(x))))",
+      "B": "((ForAll(x, ResearchProject(x)) → (ForAll(x, Extracurricular(x)) → (Enrolled(x) → Resources(x)))) → (ForAll(x, ResearchProject(x)) → (ForAll(x, Extracurricular(x)) → (Enrolled(x) → Resources(x))))",
+      "C": "¬(ForAll(x, ResearchProject(x)) → (ForAll(x, Extracurricular(x)) → (Enrolled(x) → Resources(x))))",
+      "D": "(ForAll(x, ResearchProject(x)) → (ForAll(x, Extracurricular(x)) → (Enrolled(x) → Resources(x))))"
+    }
+  },
+  {
+    "record_id": 109,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "(Exists(x, Enrolled(x)) → ForAll(x, Enrolled(x)))",
+      "B": "((Exists(x, Enrolled(x)) → ForAll(x, Enrolled(x))) ∧ ¬(Exists(x, Enrolled(x)) → ForAll(x, Enrolled(x))))",
+      "C": "¬(Exists(x, Enrolled(x)) → ForAll(x, Enrolled(x)))",
+      "D": "((Exists(x, Enrolled(x)) → ForAll(x, Enrolled(x))) → (Exists(x, Enrolled(x)) → ForAll(x, Enrolled(x))))"
+    }
+  },
+  {
+    "record_id": 110,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "B": "It is false that if the lack of motivation leads to not participating in discussions, then all students attending class regularly ensures that attending class implies completing assignments.",
+      "C": "Both statement A and its negation are true at the same time, leading to a contradiction."
+    }
+  },
+  {
+    "record_id": 111,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "((∀x U(x) → (R(x) → P(x))) ∧ ¬(∀x U(x) → (R(x) → P(x))))",
+      "B": "¬(∀x U(x) → (R(x) → P(x)))",
+      "C": "(∀x U(x) → (R(x) → P(x)))",
+      "D": "((∀x U(x) → (R(x) → P(x))) → (∀x U(x) → (R(x) → P(x))))"
+    }
+  },
+  {
+    "record_id": 112,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "B": "It is false that if not doing homework leads to failing the course, then all students attend class regularly.",
+      "C": "The statement 'If not doing homework leads to failing the course, then all students attend class regularly' is both true and false simultaneously.",
+      "D": "The statement 'If not doing homework leads to failing the course, then all students attend class regularly' is a tautology."
+    }
+  },
+  {
+    "record_id": 113,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "B": "It is false that if all students attend class, then at least one student is conducting research.",
+      "C": "The statement 'If all students attend class, then at least one student is conducting research' is always true.",
+      "D": "The statement 'If all students attend class, then at least one student is conducting research' is both true and false at the same time."
+    }
+  },
+  {
+    "record_id": 114,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "The statement 'If studying leads to passing the exam, then the previous rule (if taking a test leads to passing the exam, then studying also leads to passing the exam) holds' is both true and false at the same time.",
+      "C": "The statement 'If studying leads to passing the exam, then the previous rule holds' is true.",
+      "D": "The statement 'If studying leads to passing the exam, then the previous rule holds' is false."
+    }
+  },
+  {
+    "record_id": 118,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "'If the statement “If studying leads to understanding, then all students must complete their assignments” holds, but at the same time does not hold, it creates a contradiction.'",
+      "B": "'If studying leads to understanding, then at least one student will join a study group.'",
+      "C": "'It is not true that if studying leads to understanding, then at least one student will join a study group.'",
+      "D": "'If the previous statement is true, then it must be true in all cases where the same reasoning applies.'"
+    }
+  },
+  {
+    "record_id": 125,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "All AI models have sufficient data.",
+      "D": "No AI models use deep learning."
+    }
+  },
+  {
+    "record_id": 126,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "C": "If a programmer does not study regularly, they will not improve debugging skills."
+    }
+  },
+  {
+    "record_id": 129,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "D": "No Python code follows PEP 8 standards."
+    }
+  },
+  {
+    "record_id": 130,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "C": "A reaction is stoichiometrically correct if and only if it is unbalanced.",
+      "D": "No reaction can follow the law of conservation of mass."
+    }
+  },
+  {
+    "record_id": 131,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "A person gains knowledge if and only if they understand the content.",
+      "B": "A person gains knowledge if and only if they have read a book.",
+      "C": "A person who gains knowledge does not necessarily understand the content.",
+      "D": "A person understands content if and only if they gain wisdom."
+    }
+  },
+  {
+    "record_id": 133,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "I ate a Banh Mi.",
+      "B": "I passed the test.",
+      "C": "It is raining.",
+      "D": "I slept."
+    }
+  },
+  {
+    "record_id": 134,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Bob will graduate the school because he studies hard.",
+      "B": "Bob will be happy because he studies hard and graduates the school.",
+      "C": "Bob will pass the test because he studies hard and is never lazy.",
+      "D": "Bob will never graduate the school because he is never lazy."
+    }
+  },
+  {
+    "record_id": 135,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Jake passed Calculus 1 because he is a freshman.",
+      "B": "Jake cannot attend Calculus 2 because he did not pass Calculus 1.",
+      "C": "Jake is a freshman student and has passed Calculus 1 and Calculus 2.",
+      "D": "Jake has attended Calculus 2, implying he passed Calculus 1 and scored at least 4 points on it."
+    }
+  },
+  {
+    "record_id": 136,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "John has enough social work days to graduate.",
+      "B": "John cannot graduate because he didn't gain enough social work days and has spent 6 years at BK university.",
+      "C": "John will have to study more if he does not graduate within 6 years and is out of school.",
+      "D": "John can graduate as long as he has 15 social work days and has not spent 6 years at BK university."
+    }
+  },
+  {
+    "record_id": 137,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Mary failed the subject because her average score was less than 8.",
+      "B": "Mary received an A grade due to her scores on the midterm, project, and final exams.",
+      "C": "The average score of Mary is less than 8 because she scored 7 on the midterm.",
+      "D": "The scores of Mary don't add up to more than 8 because her midterm score was low."
+    }
+  },
+  {
+    "record_id": 138,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Peter Griffin can register for PE2 because he passed PE1.",
+      "B": "Peter Griffin cannot graduate until he registers for PE2 and passes it.",
+      "C": "Peter Griffin has already graduated because he passed PE1.",
+      "D": "Peter Griffin must take PE1 again because he is a freshman."
+    }
+  },
+  {
+    "record_id": 139,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Tu has gained experience and improved their skills.",
+      "B": "Tu is not confident yet because they have not improved their skills.",
+      "C": "Tu has attended fewer than 2 events, so they have not gained experience.",
+      "D": "Tu has improved their skills but has not gained experience."
+    }
+  },
+  {
+    "record_id": 140,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Tuan can stay in the BK dormitory because he is in the first semester and has a studying schedule.",
+      "B": "Tuan failed a subject, so he cannot stay in the BK dormitory.",
+      "C": "Tuan is not allowed to register in the dormitory because he has not registered subjects.",
+      "D": "Tuan has registered subjects for the semester, so he can stay in the BK dormitory."
+    }
+  },
+  {
+    "record_id": 141,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Kahne will not receive guidance because they are not a BK student.",
+      "B": "Kahne can write a science article if they receive guidance and broaden their knowledge through training.",
+      "C": "Kahne will not get plus points in their graduation thesis because they have not published an article.",
+      "D": "Kahne needs to complete more training before they can write the article, even though they are a lab member."
+    }
+  },
+  {
+    "record_id": 142,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Coke can get an internship or go to work because they are a fourth-year student.",
+      "B": "Coke is guaranteed to get a job because they are a fourth-year student.",
+      "C": "Coke has a good CV because they are a fourth-year student.",
+      "D": "Coke doesn't need a CV to get a job because they are a fourth-year student."
+    }
+  },
+  {
+    "record_id": 143,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "The Titan computer is likely to have a strong cooling unit because it runs complex software and supports multitasking efficiently.",
+      "B": "The Titan computer does not support multitasking efficiently because it lacks enough RAM.",
+      "C": "The Titan computer does not require a cooling unit because it runs complex software.",
+      "D": "The Titan computer has enough RAM because it supports multitasking efficiently."
+    }
+  },
+  {
+    "record_id": 144,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "The AlphaNet model does not require hyperparameter tuning because it achieves high accuracy.",
+      "B": "The AlphaNet model has been extensively tuned because it achieves high accuracy and processes data quickly.",
+      "C": "The AlphaNet model uses a weak GPU because it processes data quickly.",
+      "D": "The AlphaNet model achieves high accuracy because it uses a powerful GPU and processes data quickly."
+    }
+  },
+  {
+    "record_id": 145,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "A variable declared with 'let' is immutable and block-scoped.",
+      "B": "A function can be declared with either the 'function' keyword or arrow syntax, making it callable.",
+      "C": "If a promise is rejected, the 'then' block will be executed before the 'catch' block.",
+      "D": "The DOM in JavaScript is used for network requests and manipulation of HTML elements."
+    }
+  },
+  {
+    "record_id": 146,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "C++ does not support exception handling because it does not use 'try', 'catch', and 'throw' keywords.",
+      "B": "C++ uses pointers to reference memory locations and can dynamically allocate memory.",
+      "C": "C++ functions cannot return values because they are not declared with a return type.",
+      "D": "The STL in C++ does not contain vectors or maps because it does not support templates."
+    }
+  },
+  {
+    "record_id": 185,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "If someone is eligible for the seminar, they have completed registration requirements.",
+      "B": "Everyone who submits a report has both certifications.",
+      "C": "Someone eligible for the seminar has both certifications.",
+      "D": "Not registering for the seminar means you have certifications."
+    }
+  },
+  {
+    "record_id": 186,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "B": "Some students are not eligible to register.",
+      "C": "No students are eligible to register.",
+      "D": "Eligibility to register depends on year level."
+    }
+  },
+  {
+    "record_id": 187,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "B": "Some individuals are not eligible for healthcare services.",
+      "C": "No individuals are eligible for healthcare services.",
+      "D": "Eligibility depends on attending the appointment."
+    }
+  },
+  {
+    "record_id": 188,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "If a student is enrolled, they complete the subject successfully.",
+      "B": "If a student attends the lab, they are not enrolled.",
+      "D": "No student completes the subject successfully."
+    }
+  },
+  {
+    "record_id": 189,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "If a student attends classes regularly, they successfully find lectures.",
+      "B": "If a student is engaged in studying, they improve their understanding.",
+      "C": "All students actively search for lectures.",
+      "D": "No student finds lectures to help in studying."
+    }
+  },
+  {
+    "record_id": 190,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "If a student has feedback, they completed the internship requirements.",
+      "B": "If a student has the stamp, they have feedback.",
+      "C": "All students have the company stamp.",
+      "D": "No student has feedback."
+    }
+  },
+  {
+    "record_id": 191,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "B": "All students raised issues about paying fees.",
+      "C": "No students received confirmation of payment."
+    }
+  },
+  {
+    "record_id": 192,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "All students have passed the course.",
+      "B": "All students complete exercises but not assignments.",
+      "C": "No students complete assignments.",
+      "D": "No students have passed the course."
+    }
+  },
+  {
+    "record_id": 193,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "All students receive social work points.",
+      "C": "No students are involved in social work.",
+      "D": "No students donate blood."
+    }
+  },
+  {
+    "record_id": 194,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "B": "All students do not pay the required fees.",
+      "C": "No students are allowed to continue studying.",
+      "D": "Some students pay the fees but cannot continue studying."
+    }
+  },
+  {
+    "record_id": 195,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "B": "All students have not completed course requirements.",
+      "C": "No students are eligible for the final exam.",
+      "D": "Some students complete quizzes but are not eligible."
+    }
+  },
+  {
+    "record_id": 196,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "All students have met the safety requirements for the lab.",
+      "C": "No students are required to wear a blouse in the lab.",
+      "D": "Some students meet safety requirements but do not wear a blouse."
+    }
+  },
+  {
+    "record_id": 197,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "All students who eat food from the canteen get sick.",
+      "C": "No students eat food from the canteen.",
+      "D": "Some students do not get sick from eating canteen food."
+    }
+  },
+  {
+    "record_id": 198,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "C": "No students complete the course successfully.",
+      "D": "Some students complete the course but are not eligible for graduation."
+    }
+  },
+  {
+    "record_id": 199,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "B": "All students have passed the course.",
+      "C": "Some students are eligible for the next course.",
+      "D": "Some students work on a project but don’t complete it."
+    }
+  },
+  {
+    "record_id": 200,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "All students sleep in the library during the designated time.",
+      "C": "No students use the library for sleeping.",
+      "D": "Some students are not allowed to sleep in the library."
+    }
+  },
+  {
+    "record_id": 201,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Some students complete their studies successfully",
+      "C": "Some students are not actively studying",
+      "D": "Some students do not attend all required lectures"
+    }
+  },
+  {
+    "record_id": 202,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "All individuals complete assignments",
+      "C": "Some individuals do not complete tasks",
+      "D": "Some individuals are not engaged in educational activities"
+    }
+  },
+  {
+    "record_id": 203,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "All students applying for a scholarship have completed all required tasks",
+      "B": "All students have received a scholarship",
+      "C": "Some students apply but have not received a scholarship",
+      "D": "Some students are eligible but have not received a scholarship"
+    }
+  },
+  {
+    "record_id": 204,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Some students study offline",
+      "B": "All students complete online study tasks",
+      "C": "Some students do not complete offline tasks",
+      "D": "All students manage offline and online study time effectively"
+    }
+  },
+  {
+    "record_id": 205,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Some students study offline",
+      "B": "All students study online",
+      "C": "Some students do not complete offline tasks",
+      "D": "All students manage offline and online study time effectively"
+    }
+  },
+  {
+    "record_id": 206,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "((¬certified(x) → ¬can_teach(x)) ∧ ¬(¬can_teach(x) → ¬research_foundation(x)))",
+      "B": "((¬certified(x) → ¬can_teach(x)) → (¬can_teach(x) → ¬research_foundation(x)))",
+      "C": "((¬can_teach(x) → ¬research_foundation(x)) → (¬certified(x) → ¬can_teach(x)))",
+      "D": "¬((¬certified(x) → ¬can_teach(x)) → (¬can_teach(x) → ¬research_foundation(x)))"
+    }
+  },
+  {
+    "record_id": 207,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "∀x (publishes_papers(x) → teaches(x))",
+      "B": "(∀x (teaches(x) → publishes_papers(x)) ∧ ¬∀x (teaches(x) → publishes_papers(x)))",
+      "C": "∀x (teaches(x) → publishes_papers(x))",
+      "D": "¬∀x (teaches(x) → publishes_papers(x))"
+    }
+  },
+  {
+    "record_id": 208,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "∀x (R(x) → P(x))",
+      "B": "(∀x (P(x) → R(x)) ∧ ¬∀x (P(x) → R(x)))",
+      "C": "∀x (P(x) → R(x))",
+      "D": "¬∀x (P(x) → R(x))"
+    }
+  },
+  {
+    "record_id": 209,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "∀x (S(x) → Q(x))",
+      "B": "(∀x (Q(x) → S(x)) ∧ ¬∀x (Q(x) → S(x)))",
+      "C": "∀x (Q(x) → S(x))",
+      "D": "¬∀x (Q(x) → S(x))"
+    }
+  },
+  {
+    "record_id": 210,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "∀x (P(x) → S(x))",
+      "B": "∀x (S(x) → P(x))",
+      "C": "¬∀x (S(x) → P(x))",
+      "D": "(∀x (S(x) → P(x)) ∧ ¬∀x (S(x) → P(x)))"
+    }
+  },
+  {
+    "record_id": 211,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "∀x (T(x) → R(x))",
+      "B": "∀x (S(x) → P(x))",
+      "C": "¬∀x (S(x) → P(x))",
+      "D": "(∀x (S(x) → P(x)) ∧ ¬∀x (S(x) → P(x)))"
+    }
+  },
+  {
+    "record_id": 212,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "∀x (T(x) → R(x))",
+      "B": "¬∀x (S(x) → P(x))",
+      "C": "∀x (S(x) → P(x))",
+      "D": "(∀x (S(x) → P(x)) ∧ ¬∀x (S(x) → P(x)))"
+    }
+  },
+  {
+    "record_id": 213,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "∀x (R(x) → Q(x))",
+      "B": "∀x (Q(x) → R(x))",
+      "C": "¬∀x (R(x) → Q(x))",
+      "D": "(∀x (R(x) → Q(x)) ∧ ¬∀x (R(x) → Q(x)))"
+    }
+  },
+  {
+    "record_id": 214,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "∀x (S(x) → R(x))",
+      "B": "∀x (R(x) → S(x))",
+      "C": "¬∀x (S(x) → R(x))",
+      "D": "(∀x (S(x) → R(x)) ∧ ¬∀x (S(x) → R(x)))"
+    }
+  },
+  {
+    "record_id": 215,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "∀x (S(x) → R(x))",
+      "B": "∀x (P(x) → T(x))",
+      "C": "¬∀x (S(x) → R(x))",
+      "D": "(∀x (S(x) → R(x)) ∧ ¬∀x (S(x) → R(x)))"
+    }
+  },
+  {
+    "record_id": 216,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "∀x (R(x) → T(x))",
+      "B": "¬∀x (T(x) → R(x))",
+      "C": "∀x (T(x) → R(x))",
+      "D": "(∀x (T(x) → R(x)) ∧ ¬∀x (T(x) → R(x)))"
+    }
+  },
+  {
+    "record_id": 217,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "∀x (K(x) → S(x))",
+      "B": "¬∀x (S(x) → K(x))",
+      "C": "∀x (S(x) → K(x))",
+      "D": "(∀x (S(x) → K(x)) ∧ ¬∀x (S(x) → K(x)))"
+    }
+  },
+  {
+    "record_id": 218,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "∀x (S(x) → R(x))",
+      "B": "∀x (R(x) → S(x))",
+      "C": "¬∀x (R(x) → S(x))",
+      "D": "(∀x (R(x) → S(x)) ∧ ¬∀x (R(x) → S(x)))"
+    }
+  },
+  {
+    "record_id": 219,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "∀x (U(x) → P(x))",
+      "B": "¬∀x (P(x) → U(x))",
+      "C": "∀x (P(x) → U(x))",
+      "D": "(∀x (P(x) → U(x)) ∧ ¬∀x (P(x) → U(x)))"
+    }
+  },
+  {
+    "record_id": 220,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "∀x (R(x) → T(x))",
+      "B": "∀x (T(x) → R(x))",
+      "C": "¬∀x (R(x) → T(x))",
+      "D": "(∀x (R(x) → T(x)) ∧ ¬∀x (R(x) → T(x)))"
+    }
+  },
+  {
+    "record_id": 233,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "B": "Some students are revising but not understanding the material.",
+      "C": "No students are revising or understanding the material.",
+      "D": "Understanding the material implies not revising."
+    }
+  },
+  {
+    "record_id": 240,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Some students meet professional teaching standards",
+      "B": "Some students do not possess basic teaching skills",
+      "C": "All students have completed the Educational Psychology course",
+      "D": "Some students are not enrolled in the Teacher Education program"
+    }
+  },
+  {
+    "record_id": 241,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Some students have submitted a research proposal",
+      "B": "All students have passed the Research Methodology course",
+      "C": "Some students are not enrolled in a thesis-based program"
+    }
+  },
+  {
+    "record_id": 242,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Some online students have viewed at least one lecture video",
+      "B": "All online students have completed a module quiz",
+      "C": "Some online students have not logged into the platform",
+      "D": "All online students have submitted a course feedback form"
+    }
+  },
+  {
+    "record_id": 243,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Some students are members of the student council",
+      "B": "All students complete all assignments on time",
+      "C": "Some students do not follow the classroom rules",
+      "D": "Some students do not receive positive participation marks"
+    }
+  },
+  {
+    "record_id": 244,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Some students are eligible to take the end-of-term quiz",
+      "C": "Some students have not submitted all required assignments",
+      "D": "All students have volunteered in school activities"
+    }
+  },
+  {
+    "record_id": 245,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "All students have reviewed the course materials",
+      "B": "Some students have not participated actively in class",
+      "C": "Some students are not well-prepared for class discussions",
+      "D": "All students have joined a study group"
+    }
+  },
+  {
+    "record_id": 246,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "All participants have signed the liability waiver",
+      "B": "Some participants have not received the safety briefing",
+      "C": "Some participants are not equipped with proper outdoor gear",
+      "D": "All participants have not completed the registration form"
+    }
+  },
+  {
+    "record_id": 247,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "All students have been invited to the group",
+      "B": "Some students have not agreed to join a group",
+      "C": "Some students are not considered active group members",
+      "D": "All students have submitted the group contract"
+    }
+  },
+  {
+    "record_id": 248,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "All students meet the seminar's eligibility criteria",
+      "B": "Some students do not meet the seminar's eligibility criteria",
+      "C": "Some students have not submitted a complete seminar application",
+      "D": "Some students have not shown interest in the seminar"
+    }
+  },
+  {
+    "record_id": 249,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "All students have received a festival invitation",
+      "B": "Some students do not have access to festival activities",
+      "C": "Some students are not attending the university festival",
+      "D": "All students have not registered for the festival"
+    }
+  },
+  {
+    "record_id": 250,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Some students are eligible for the scholarship",
+      "B": "All students have maintained a good academic standing",
+      "C": "Some students will not be shortlisted for an interview",
+      "D": "All students have submitted a scholarship application"
+    }
+  },
+  {
+    "record_id": 251,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "B": "Some students have not requested permission to be absent",
+      "C": "Some students are not granted permission to be absent",
+      "D": "All students provided a valid reason for absence"
+    }
+  },
+  {
+    "record_id": 252,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Some students have formed a team",
+      "B": "All students have submitted a competition application",
+      "C": "Some students are not registered for the competition",
+      "D": "All students have shown interest in the competition"
+    }
+  },
+  {
+    "record_id": 253,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "All persons have been trained to recognize scams",
+      "B": "Some persons are vulnerable to scammers",
+      "C": "Some persons have not been trained to recognize scams"
+    }
+  },
+  {
+    "record_id": 254,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Some students gain more knowledge",
+      "B": "All students do not use online documents",
+      "C": "Some students do not gain more knowledge",
+      "D": "All students use online documents and do not gain knowledge"
+    }
+  },
+  {
+    "record_id": 255,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Some students have received clearance from the academic office",
+      "B": "All students have not submitted the exam eligibility form",
+      "C": "Some students are not allowed to attend the final exam",
+      "D": "All students have confirmed their exam schedule"
+    }
+  },
+  {
+    "record_id": 256,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Some students behaved suspiciously during the exam",
+      "B": "All students were caught using unauthorized materials",
+      "C": "Some students were not reported for cheating"
+    }
+  },
+  {
+    "record_id": 257,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "All students have improved their communication skills",
+      "B": "Some students did not participate in group projects",
+      "C": "All students have developed leadership abilities",
+      "D": "Some students have not attended soft skills workshops"
+    }
+  },
+  {
+    "record_id": 258,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Some students have created a personal study-work schedule",
+      "C": "Some students do not maintain consistent academic performance",
+      "D": "All students report feeling balanced between work and study"
+    }
+  },
+  {
+    "record_id": 259,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Some students have gained international experience",
+      "B": "All students have received support from the international office",
+      "C": "Some students are not ready to join the international community",
+      "D": "All students have applied for an exchange program"
+    }
+  },
+  {
+    "record_id": 260,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "∃x G(x)",
+      "B": "∀x ¬S(x)",
+      "C": "∀x ¬F(x)",
+      "D": "∀x A(x)"
+    }
+  },
+  {
+    "record_id": 261,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "¬∀x (R(x) → E(x))",
+      "B": "∀x (S(x) → C(x))",
+      "C": "∀x ¬S(x)",
+      "D": "∀x (E(x) → ¬R(x))"
+    }
+  },
+  {
+    "record_id": 262,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "∃x S(x)",
+      "B": "∀x ¬N(x)",
+      "C": "∀x ¬T(x)",
+      "D": "∃x I(x)"
+    }
+  },
+  {
+    "record_id": 263,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "∀x W(x)",
+      "B": "∀x (¬C(x) → ¬P(x))",
+      "C": "∀x (¬J(x) → ¬F(x))",
+      "D": "∀x (N(x) → K(x))"
+    }
+  },
+  {
+    "record_id": 264,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "∀x (S(x) → T(x))",
+      "B": "∀x (T(x) → S(x))",
+      "C": "¬∀x (S(x) → T(x))",
+      "D": "∀x (S(x) → ¬T(x))"
+    }
+  },
+  {
+    "record_id": 265,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "There exists a student who does not study regularly.",
+      "B": "There exists a student who does not qualify for a scholarship.",
+      "C": "All students attend training.",
+      "D": "No student understands the material."
+    }
+  },
+  {
+    "record_id": 266,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "There exists a student who does not receive a recommendation letter.",
+      "B": "There exists a student who does not pass the exam.",
+      "C": "All students attend tutoring sessions.",
+      "D": "All students do not study regularly."
+    }
+  },
+  {
+    "record_id": 267,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "There exists a student who does not receive a recommendation letter.",
+      "B": "There exists a student who does not attend tutoring sessions.",
+      "C": "All students pass the exam.",
+      "D": "All students do not study regularly."
+    }
+  },
+  {
+    "record_id": 268,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "There exists a student who does not receive an award.",
+      "B": "There exists a student who does not pass the exam.",
+      "C": "All students study regularly.",
+      "D": "There exists a student who does not attend tutoring sessions."
+    }
+  },
+  {
+    "record_id": 269,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "There exists a student who does not qualify for a scholarship.",
+      "B": "There exists a student who does not receive an award.",
+      "C": "All students pass the exam.",
+      "D": "There exists a student who does not study regularly."
+    }
+  },
+  {
+    "record_id": 270,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "There exists a student who does not understand the material.",
+      "B": "There exists a student who does not study regularly.",
+      "C": "All students complete assignments.",
+      "D": "There exists a student who does not pass the exam."
+    }
+  },
+  {
+    "record_id": 271,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "There exists a student who does not attend tutoring sessions.",
+      "B": "There exists a student who does not study regularly.",
+      "C": "All students qualify for a scholarship.",
+      "D": "There exists a student who does not pass the exam."
+    }
+  },
+  {
+    "record_id": 272,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "There exists a student who does not receive a recommendation letter.",
+      "B": "There exists a student who does not attend tutoring sessions.",
+      "C": "All students qualify for a scholarship.",
+      "D": "There exists a student who does not study regularly."
+    }
+  },
+  {
+    "record_id": 273,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "There exists a student who is not prepared.",
+      "B": "There exists a student who does not ask questions.",
+      "C": "All students attend university.",
+      "D": "There exists a student who does not study regularly."
+    }
+  },
+  {
+    "record_id": 274,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "There exists a student who does not study regularly.",
+      "B": "There exists a student who does not pass the exam.",
+      "C": "All students qualify for a scholarship.",
+      "D": "There exists a student who does not receive a recommendation letter."
+    }
+  },
+  {
+    "record_id": 275,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "B": "If a broader understanding implies mentoring, and we deny that implication, both remain true.",
+      "C": "It is impossible that a broader understanding implies mentoring leads to investing time in project-based learning implying a broader understanding."
+    }
+  },
+  {
+    "record_id": 276,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "B": "It is not the case that researchers who write publications provide novel insights that sustain student excellence in advanced courses."
+    }
+  },
+  {
+    "record_id": 277,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "C": "It is not the case that if studying regularly implies understanding course material, then there exists a student who passes the course."
+    }
+  },
+  {
+    "record_id": 278,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "It is not the case that if regular attendance implies understanding course material, then there exists a student qualified for graduation.",
+      "D": "It's simultaneously true and false that if regular attendance implies understanding course material, then there exists at least one student who is qualified for graduation."
+    }
+  },
+  {
+    "record_id": 279,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "It is not the case that if there is a specialized computer science learner, then an independent research project leads to an academic distinction."
+    }
+  },
+  {
+    "record_id": 280,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "B": "It is not the case that if not attending lectures regularly results in not receiving top grades, then submitting all assignments on time leads to passing with distinction.",
+      "C": "Both the statement that 'not attending lectures regularly results in not receiving top grades implies submitting assignments on time leads to passing with distinction' and its negation are simultaneously true.",
+      "D": "The statement 'if not attending lectures regularly results in not receiving top grades, then submitting all assignments on time leads to passing with distinction' implies itself."
+    }
+  },
+  {
+    "record_id": 281,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "It is not the case that if there exists a research participant, then if the existence of research participants implies non-submitters don't receive honors, there must be a teaching assistant.",
+      "C": "Both the statement that if research participants exist then there being research participants implying non-submitters don't get honors leads to teaching assistants existing and its negation are simultaneously true."
+    }
+  },
+  {
+    "record_id": 282,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "If contributing to open-source enhances portfolios implies that all bootcamp participants completing exercises develops coding skills implies itself.",
+      "B": "It is not the case that contributing to open-source projects enhancing portfolios means bootcamp participation develops coding skills.",
+      "C": "Both the statement about open-source contributions enhancing portfolios leading to bootcamp exercise completion developing coding skills and its negation are simultaneously true."
+    }
+  },
+  {
+    "record_id": 283,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "If all students submitting assignments implies that an educational technology lab existing means students participate in collaborative learning implies itself.",
+      "B": "Both the statement that all students submitting assignments means tech labs lead to collaborative learning and its negation are simultaneously true.",
+      "D": "It is not the case that all students submitting assignments implies that tech labs lead to collaborative learning."
+    }
+  },
+  {
+    "record_id": 284,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "B": "The statement 'if qualifying for honors means participating in group projects, then if participating in projects means receiving feedback, all students participate in projects' implies itself.",
+      "C": "Both the statement 'if qualifying for honors means participating in group projects implies that participating in projects means receiving feedback leads to universal participation' and its negation are simultaneously true.",
+      "D": "It is not the case that qualifying for honors meaning participation in group projects implies that participation meaning feedback receipt leads to universal project participation."
+    }
+  },
+  {
+    "record_id": 285,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Both the statement that all students qualifying for graduation implies all programs use digital resources and its negation are simultaneously true.",
+      "B": "It is not the case that all students qualifying for graduation implies all educational programs use digital resources.",
+      "C": "The statement that all students qualifying for graduation implies all programs use digital resources implies itself."
+    }
+  },
+  {
+    "record_id": 286,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "The statement 'if software development skills implying professional application production implies regular coding practice leads to software development skills' implies itself.",
+      "C": "It is not the case that software development skills implying professional application capability implies that coding practice leads to software development skills.",
+      "D": "Both the statement about software skills implying application capability leading to coding practice implying software skills and its negation are simultaneously true."
+    }
+  },
+  {
+    "record_id": 287,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "The statement 'if all students take required courses, then at least one student graduates on time' implies itself.",
+      "B": "It is not the case that all students taking required courses implies at least one student graduates on time.",
+      "C": "Both the statement that all students taking required courses implies someone graduates on time and its negation are simultaneously true."
+    }
+  },
+  {
+    "record_id": 288,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "The necessary connection between native speaker engagement, immersion program completion, and conversational fluency is logically inconsistent.",
+      "B": "It is not the case that failure to engage with native speakers preventing immersion program completion implies completing immersion programs develops conversational fluency.",
+      "D": "Language students who engage with native speakers both do and do not achieve conversational fluency through immersion programs."
+    }
+  },
+  {
+    "record_id": 289,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "The statement that online resource utilization implying team project participation leads to universal online resource utilization implies itself.",
+      "C": "Both the statement that students utilizing online resources implying team project participation leads to universal online resource utilization and its negation are simultaneously true.",
+      "D": "It is not the case that online resource utilization implying team project participation leads to universal online resource utilization."
+    }
+  },
+  {
+    "record_id": 290,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "It is not the case that thesis-incorporating programs being research-based implies the existence of students qualifying for honors distinction.",
+      "C": "Both the statement that thesis-requiring programs being research-based implies honors-qualifying students exist and its negation are simultaneously true.",
+      "D": "The statement that thesis-incorporating programs being research-based implies honors-qualifying students exist implies itself."
+    }
+  },
+  {
+    "record_id": 291,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "The given implication is self-implying.",
+      "B": "Both the statement and its negation are true.",
+      "D": "The given implication is false."
+    }
+  },
+  {
+    "record_id": 292,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "At least one student can borrow library books",
+      "C": "Some students don’t pay tuition fees",
+      "D": "All students have finished their graduation requirements"
+    }
+  },
+  {
+    "record_id": 293,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Excessive competition leads to stress and prioritizing grades.",
+      "B": "Excessive competition improves motivation and performance.",
+      "C": "Excessive competition has no impact on students.",
+      "D": "Excessive competition enhances deep understanding."
+    }
+  },
+  {
+    "record_id": 294,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Some policies are effective.",
+      "C": "No policies are effective.",
+      "D": "Effectiveness is unrelated to engagement."
+    }
+  },
+  {
+    "record_id": 295,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Some teaching methods are effective.",
+      "C": "No teaching methods are effective.",
+      "D": "Effectiveness requires modern facilities."
+    }
+  },
+  {
+    "record_id": 296,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Some students solve complex problems.",
+      "B": "All students solve complex problems.",
+      "C": "No students solve complex problems.",
+      "D": "Problem-solving depends on mock tests."
+    }
+  },
+  {
+    "record_id": 297,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Some universities increase accessibility.",
+      "B": "All universities increase accessibility.",
+      "C": "No universities increase accessibility.",
+      "D": "Accessibility depends on research programs."
+    }
+  },
+  {
+    "record_id": 298,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Some students improve academic performance.",
+      "B": "All students develop teamwork skills.",
+      "C": "No students are motivated.",
+      "D": "Students struggle with critical thinking."
+    }
+  },
+  {
+    "record_id": 299,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Some students develop better problem-solving skills.",
+      "B": "All students lack engagement.",
+      "C": "No students improve cultural awareness.",
+      "D": "Students neglect creativity."
+    }
+  },
+  {
+    "record_id": 300,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Some students enhance creativity.",
+      "B": "Some students improve reasoning.",
+      "C": "No students improve reasoning.",
+      "D": "Students struggle with progress tracking."
+    }
+  },
+  {
+    "record_id": 301,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Some students handle workloads efficiently.",
+      "B": "All students struggle with critical thinking.",
+      "C": "No students achieve better outcomes.",
+      "D": "Some students improve academic performance."
+    }
+  },
+  {
+    "record_id": 302,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Some students improve cognitive function.",
+      "B": "All students lack motivation.",
+      "C": "No students apply practical knowledge.",
+      "D": "Some students set better academic goals."
+    }
+  },
+  {
+    "record_id": 303,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "All students install the software.",
+      "B": "All students update the software.",
+      "C": "There exists a student with access to the latest features."
+    }
+  },
+  {
+    "record_id": 304,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "There exists a student who is not enrolled.",
+      "B": "There exists a student who does not complete assignments.",
+      "C": "All students attend lectures.",
+      "D": "There exists a student who does not study consistently."
+    }
+  },
+  {
+    "record_id": 305,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "B": "There exists a book that is not cataloged.",
+      "C": "There exists a book that is returned."
+    }
+  },
+  {
+    "record_id": 306,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "There exists a student who has not mastered Calculus.",
+      "B": "There exists a student who does not practice exercises.",
+      "C": "All students attend lectures.",
+      "D": "There exists a student who does not perform well in exams."
+    }
+  },
+  {
+    "record_id": 307,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "There exists a student who does not pass the test.",
+      "B": "There exists a student who does not submit assignments.",
+      "C": "There exists a student who attends lectures.",
+      "D": "Every student completes the project."
+    }
+  },
+  {
+    "record_id": 308,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Every student attends office hours.",
+      "B": "There exists a student with no good chance to pass the exam.",
+      "C": "There exists a student likely to pass the exam.",
+      "D": "Every student participates in a study group."
+    }
+  },
+  {
+    "record_id": 309,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "There exists a script without error handling.",
+      "B": "There exists a program that does not produce reliable outputs.",
+      "D": "There exists a program that does not follow best practices."
+    }
+  },
+  {
+    "record_id": 310,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "There exists a function that is not differentiable.",
+      "B": "There exists a function that satisfies the Intermediate Value Theorem.",
+      "D": "There exists a function that is not continuous."
+    }
+  },
+  {
+    "record_id": 311,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "There exists a student not attending the course.",
+      "B": "There exists a student who passes the course.",
+      "C": "All students attend lectures regularly.",
+      "D": "There exists a student not completing assignments."
+    }
+  },
+  {
+    "record_id": 312,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Frieren is required to pay the tutor fee.",
+      "B": "Frieren must register for the BKA program due to her status as an OISP student.",
+      "C": "Frieren can choose to delay the tutor fee.",
+      "D": "Frieren must register for the BKA program."
+    }
+  },
+  {
+    "record_id": 313,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Sarifi failed due to absence.",
+      "B": "Sarifi didn’t fail and wasn’t absent.",
+      "C": "Sarifi failed despite bringing a paper.",
+      "D": "Sarifi was absent but didn’t fail."
+    }
+  },
+  {
+    "record_id": 314,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Mia lacked knowledge.",
+      "B": "Mia received help from others.",
+      "C": "Mia did well due to knowledge.",
+      "D": "Mia didn’t study hard."
+    }
+  },
+  {
+    "record_id": 315,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Mia lacked knowledge but got help.",
+      "B": "Mia studied hard.",
+      "C": "Mia helped others.",
+      "D": "Mia did well without helping others."
+    }
+  },
+  {
+    "record_id": 316,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Iruma completed a graduation project.",
+      "B": "Iruma gained enough labor days.",
+      "C": "Iruma’s graduation status is uncertain.",
+      "D": "Iruma is eligible for the graduation project."
+    }
+  },
+  {
+    "record_id": 317,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Yashiro passed the course.",
+      "B": "Yashiro failed the course.",
+      "C": "Yashiro did not redo the assignment.",
+      "D": "It is uncertain whether Yashiro passed the course."
+    }
+  },
+  {
+    "record_id": 318,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Ponko passed the final exam.",
+      "B": "Ponko failed due to low exam score.",
+      "C": "Ponko’s failure depends on quiz attendance.",
+      "D": "Ponko failed due to missing a class."
+    }
+  },
+  {
+    "record_id": 319,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Dio is not hardworking.",
+      "B": "Dio did not gain knowledge.",
+      "C": "Dio read books.",
+      "D": "It is uncertain whether Dio read books."
+    }
+  },
+  {
+    "record_id": 320,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Rillance skipped classes.",
+      "B": "Rillance stayed on the basketball team.",
+      "C": "Rillance scored high without attending.",
+      "D": "Rillance got external help."
+    }
+  },
+  {
+    "record_id": 321,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "No student develops skills.",
+      "B": "All students achieve success.",
+      "C": "Some student contributes to society.",
+      "D": "No student accesses education."
+    }
+  },
+  {
+    "record_id": 322,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Ruri failed the assignment.",
+      "B": "Ruri did the assignment by herself.",
+      "C": "Ruri did not gain experience.",
+      "D": "It is uncertain whether Ruri did the assignment by herself."
+    }
+  },
+  {
+    "record_id": 323,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "They don’t learn.",
+      "B": "Some have motivation.",
+      "C": "They don’t improve.",
+      "D": "They lack experience."
+    }
+  },
+  {
+    "record_id": 324,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Knowledge.",
+      "B": "No skills.",
+      "C": "Movies.",
+      "D": "Certificates."
+    }
+  },
+  {
+    "record_id": 325,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Some like sports.",
+      "B": "All gain knowledge.",
+      "C": "None solve problems.",
+      "D": "Some skip education."
+    }
+  },
+  {
+    "record_id": 326,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Overfitting captures noise.",
+      "B": "Clustering predicts outputs.",
+      "C": "Underfitting enhances generalization.",
+      "D": "Regression groups data."
+    }
+  },
+  {
+    "record_id": 327,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Indexes speed up retrieval.",
+      "B": "DELETE adds records.",
+      "C": "PRIMARY KEY groups rows.",
+      "D": "INSERT sorts data."
+    }
+  },
+  {
+    "record_id": 328,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "If a student cannot apply concepts, they cannot engage in the learning process.",
+      "B": "If a student does not engage, they do not understand the core concepts.",
+      "C": "All students apply concepts.",
+      "D": "There exists a student who does not apply concepts but engages in the learning process."
+    }
+  },
+  {
+    "record_id": 329,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "∀x (U(x) → R(x))",
+      "B": "¬∀x (R(x) → U(x))",
+      "C": "∀x (Q(x) → R(x))",
+      "D": "¬∀x (U(x) → R(x))"
+    }
+  },
+  {
+    "record_id": 330,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "∀x (U(x) → S(x))",
+      "B": "¬∀x (U(x) → S(x))",
+      "C": "∀x (¬P(x) → ¬S(x))",
+      "D": "∀x (S(x) → ¬P(x))"
+    }
+  },
+  {
+    "record_id": 331,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "∀x (P(x) → S(x))",
+      "B": "¬∀x (P(x) → S(x))",
+      "C": "∀x (P(x) → ¬S(x))",
+      "D": "∀x (S(x) → ¬P(x))"
+    }
+  },
+  {
+    "record_id": 332,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "∀x (R(x) → S(x))",
+      "B": "¬∀x (R(x) → S(x))",
+      "C": "∀x (R(x) → ¬S(x))",
+      "D": "∀x (S(x) → ¬R(x))"
+    }
+  },
+  {
+    "record_id": 333,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "∀x (¬S(x) → (¬P(x) ∧ ¬A(x)))",
+      "B": "∀x (L(x) → ¬C(x))",
+      "C": "∀x (¬S(x) → V(x))",
+      "D": "∀x (¬(T(x) → V(x)))"
+    }
+  },
+  {
+    "record_id": 334,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "∀x (B(x) → P2(x))",
+      "B": "∀x (G(x) → ¬V(x))",
+      "C": "∀x (F(x) → ¬D(x))",
+      "D": "∀x (T2(x) → ¬L2(x))"
+    }
+  },
+  {
+    "record_id": 335,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "∀x ((B(x) ∧ A(x) ∧ (S(x) ∨ T(x))) → (R(x) ∧ L(x)))",
+      "B": "∀x ((R2(x) ∧ T3(x)) → B3(x))",
+      "C": "∀x ((I(x) ∧ O(x)) → K(x))",
+      "D": "∀x (¬V(x) → ¬U(x))"
+    }
+  },
+  {
+    "record_id": 336,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "If all students pass Philosophy, all are admitted to the Honors program.",
+      "B": "It is false that passing Philosophy guarantees Honors admission.",
+      "C": "The statement 'If all pass Philosophy, all join Honors' is tautologically true.",
+      "D": "The policy about Honors admission is contradictory."
+    }
+  },
+  {
+    "record_id": 337,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "The policy linking Thesis and Scholarships is contradictory.",
+      "B": "The policy is both true and false.",
+      "C": "The policy 'No Thesis → No Philosophy' implies 'Thesis → Scholarship'.",
+      "D": "The policy is a tautology."
+    }
+  },
+  {
+    "record_id": 338,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "'Mandatory Thesis implies Research grants' is a tautology.",
+      "B": "The policy is contradictory.",
+      "C": "Mandatory Thesis completion ensures at least one Research grant.",
+      "D": "The policy is both true and false."
+    }
+  },
+  {
+    "record_id": 339,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Research grant availability ensuring universal housing.",
+      "B": "The housing policy is contradictory.",
+      "C": "The policy is a tautology.",
+      "D": "Research grants do not guarantee housing."
+    }
+  },
+  {
+    "record_id": 340,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Philosophy enabling Quantum enrollment ensures some students get Research grants.",
+      "B": "The Research grant policy is contradictory.",
+      "C": "The policy is a tautology.",
+      "D": "Philosophy and Quantum enrollment are unrelated to grants."
+    }
+  },
+  {
+    "record_id": 341,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "The Thesis-Research rule is a tautology.",
+      "B": "The policy is contradictory.",
+      "C": "The rule 'No Research → No Thesis' ensures Thesis completion.",
+      "D": "The rule is both true and false."
+    }
+  },
+  {
+    "record_id": 342,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "The Research-Thesis policy is contradictory.",
+      "B": "The Research-Thesis rule enforces Philosophy-Research compliance.",
+      "C": "The policy is both true and false.",
+      "D": "The rule is a tautology."
+    }
+  },
+  {
+    "record_id": 343,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "The housing-Scholarship policy is contradictory.",
+      "B": "Universal housing ensures Scholarship-Thesis compliance under Quantum enrollment.",
+      "C": "The policy is a tautology.",
+      "D": "Housing and Quantum enrollment are unrelated."
+    }
+  },
+  {
+    "record_id": 344,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Thesis existence doesn't affect research rules.",
+      "B": "Policy contradiction exists.",
+      "C": "Thesis submissions activate research-quantum link.",
+      "D": "The rule is tautological."
+    }
+  },
+  {
+    "record_id": 345,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Universal advisor approval → (No enrollment → No registration)",
+      "B": "Policy contradiction exists",
+      "C": "Tautological redundancy",
+      "D": "Logical inconsistency"
+    }
+  },
+  {
+    "record_id": 346,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "¬((¬P(x) → ¬R(x)) → (U(x) → P(x)))",
+      "B": "((¬P(x) → ¬R(x)) → (U(x) → P(x)))",
+      "C": "(((¬P(x) → ¬R(x)) → (U(x) → P(x))) ∧ ¬((¬P(x) → ¬R(x)) → (U(x) → P(x))))",
+      "D": "(((¬P(x) → ¬R(x)) → (U(x) → P(x))) → ((¬P(x) → ¬R(x)) → (U(x) → P(x))))"
+    }
+  },
+  {
+    "record_id": 347,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "The policy is tautological.",
+      "B": "Philosophy-dorm rules contradict proposals.",
+      "C": "Philosophy failures → Advanced seminar seats.",
+      "D": "The system is inconsistent."
+    }
+  },
+  {
+    "record_id": 348,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "It is not true that if an object having property T implies it has property Q then all objects have property T.",
+      "C": "It is both true and not true that if an object having property T implies it has property Q then all objects have property T."
+    }
+  },
+  {
+    "record_id": 349,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Denial of Quantum-Research link.",
+      "B": "Contradictory policies.",
+      "C": "Quantum students → Research requires Philosophy.",
+      "D": "Tautological redundancy."
+    }
+  },
+  {
+    "record_id": 350,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "It is not the case that if there exists an object with property U then if an object lacks property S it does not have property P.",
+      "D": "It is both true and not true that if there exists an object with property U then if an object lacks property S it does not have property P."
+    }
+  },
+  {
+    "record_id": 351,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "B": "It is not true that if there exists at least one object with property R then every object has property P.",
+      "C": "It is both true and not true that if there exists at least one object with property R then every object has property P."
+    }
+  },
+  {
+    "record_id": 352,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Tautological redundancy.",
+      "B": "Philosophy failures → Research-dormitory link.",
+      "C": "Contradictory rules.",
+      "D": "Logical inconsistency."
+    }
+  },
+  {
+    "record_id": 353,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Exam-Research rule → Quantum policy activation.",
+      "B": "Contradiction in rules.",
+      "C": "Tautological redundancy.",
+      "D": "Policy denial."
+    }
+  },
+  {
+    "record_id": 354,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "It is not true that if an object having property U implies it has property T then every object has property P.",
+      "C": "It is both true and not true that if an object having property U implies it has property T then every object has property P."
+    }
+  },
+  {
+    "record_id": 355,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "It is not true that if participating in extracurricular activities helps students develop social skills, then understanding the material will help them perform well in exams.",
+      "B": "Both the statement 'if participating in extracurricular activities helps students develop social skills, then understanding the material will help them perform well in exams' and its negation are true."
+    }
+  },
+  {
+    "record_id": 355,
+    "question_id": 1,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Attending classes regularly, participating in extracurricular activities.",
+      "B": "Developing social skills, pursuing interests.",
+      "C": "Accessing quality education, understanding material.",
+      "D": "Participating in extracurricular activities, pursuing interests."
+    }
+  },
+  {
+    "record_id": 356,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "It is both true and false that if there exists at least one student who has completed the Thesis Writing course, then all students are enrolled in Research Methods.",
+      "B": "It is false that if there exists at least one student who has completed the Thesis Writing course, then all students are enrolled in Research Methods."
+    }
+  },
+  {
+    "record_id": 357,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "C": "It is false that if a student completes the Thesis Writing course, then all students are enrolled in Research Methods.",
+      "D": "It is both true and false that if a student completes the Thesis Writing course, then all students are enrolled in Research Methods."
+    }
+  },
+  {
+    "record_id": 358,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "It is false that if all students have access to online learning resources, then they are all enrolled in at least one online course.",
+      "D": "It is both true and false that if all students have access to online learning resources, then they are all enrolled in at least one online course."
+    }
+  },
+  {
+    "record_id": 359,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Studying less than 10 hours.",
+      "B": "Failing to gain knowledge.",
+      "C": "Studying 15 hours or completing a project.",
+      "D": "Taking an assessment."
+    }
+  },
+  {
+    "record_id": 360,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "No, he lacks enrollment.",
+      "B": "Yes.",
+      "C": "No, he failed Linear Algebra.",
+      "D": "Only if he takes another prerequisite."
+    }
+  },
+  {
+    "record_id": 361,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "No, insufficient credits.",
+      "B": "Yes.",
+      "C": "No, low GPA.",
+      "D": "Only with special approval."
+    }
+  },
+  {
+    "record_id": 362,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Yes, he has five A grades.",
+      "B": "No.",
+      "C": "Only with A+ grades.",
+      "D": "Only if friends understand."
+    }
+  },
+  {
+    "record_id": 363,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Yes, all mastered the subject.",
+      "B": "Uncertain.",
+      "C": "No, only some earn A+.",
+      "D": "Only if they explain it."
+    }
+  },
+  {
+    "record_id": 364,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "B": "It is both true and false that if a student wants to understand the lesson, then there exists at least one student who does extra exercises at home.",
+      "C": "It is false that if a student wants to understand the lesson, then there exists at least one student who does extra exercises at home."
+    }
+  },
+  {
+    "record_id": 365,
+    "question_id": 1,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Failing Algorithms, not completing Capstone Project.",
+      "B": "Not enrolled in Data Structures, failing Algorithms.",
+      "C": "Not completing Programming Fundamentals, not completing Capstone Project.",
+      "D": "Failing Software Engineering, failing Algorithms."
+    }
+  },
+  {
+    "record_id": 366,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "B": "It is false that if fairness leads to trustworthiness, then transparency implies auditability.",
+      "C": "It is both true and false that if fairness leads to trustworthiness, then transparency implies auditability.",
+      "D": "Not all AI systems are trustworthy."
+    }
+  },
+  {
+    "record_id": 367,
+    "question_id": 1,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Programming Fundamentals, Mathematics for Computer Science.",
+      "B": "Advanced Programming, Programming Fundamentals.",
+      "C": "Mathematics for Computer Science, Advanced Programming.",
+      "D": "Programming Fundamentals, Advanced Programming, Mathematics for Computer Science."
+    }
+  },
+  {
+    "record_id": 368,
+    "question_id": 1,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Meeting the standard, completing the assignment, receiving a passing grade.",
+      "B": "Meeting the standard, attending the course, receiving a passing grade.",
+      "C": "Completing the assignment, assessment process, attending the course.",
+      "D": "Receiving a passing grade, meeting the standard, completing training."
+    }
+  },
+  {
+    "record_id": 369,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "∀x (R(x) → (H(x) ∧ W(x)))",
+      "B": "∀x (P(x) → ¬W(x))",
+      "C": "∀x (R(x) → ¬H(x))",
+      "D": "∀x (¬P(x) → (H(x) ∧ ¬S(x)))"
+    }
+  },
+  {
+    "record_id": 370,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "∀x (L(x) → (C(x) ∧ P(x) ∧ G(x)))",
+      "B": "∀x (L(x) → ¬G(x))",
+      "C": "∀x (S(x) → ¬L(x))",
+      "D": "∀x (K(x) → ¬E(x))"
+    }
+  },
+  {
+    "record_id": 371,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "∀x (S(x) ∧ A(x) → F(x))",
+      "B": "¬K(John)",
+      "C": "∀x (M(x) > 0 → ¬K(x))",
+      "D": "A(Sarah)"
+    }
+  },
+  {
+    "record_id": 372,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "∀x (O(x) → ¬B(x))",
+      "B": "B(An)",
+      "C": "¬F(An)",
+      "D": "¬O(An)"
+    }
+  },
+  {
+    "record_id": 373,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "∀x (P(x) → (A(x) ∧ T(x)))",
+      "B": "∀x (P(x) → ¬A(x))",
+      "C": "¬∀x P(x)",
+      "D": "∀x (E(x) → ¬T(x))"
+    }
+  },
+  {
+    "record_id": 374,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "∀x (¬A(x) → (¬R(x) ∧ ¬P(x)))",
+      "B": "∃x (¬A(x) ∧ F(x))",
+      "C": "∀x (A(x) → ¬R(x))",
+      "D": "∀x (¬S(x) → F(x))"
+    }
+  },
+  {
+    "record_id": 375,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "∀x (P(x) → E(x))",
+      "B": "∀x (F(x) → ¬E(x))",
+      "C": "∃x (¬R(x) ∧ J(x))",
+      "D": "∀x (¬P(x) → A(x))"
+    }
+  },
+  {
+    "record_id": 376,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Kelvin is allowed to take the exam for CH3002.",
+      "B": "Liam is allowed to take the exam for CH3002.",
+      "C": "Kelvin must submit a project for CH3002.",
+      "D": "Kelvin’s Homework score in CH3001 affects his eligibility for CH3002’s exam."
+    }
+  },
+  {
+    "record_id": 377,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Lan is allowed to enter the laboratory for Chemistry 101.",
+      "B": "Lan is not allowed to enter the laboratory for Chemistry 101.",
+      "C": "Kai is allowed to enter the laboratory for Chemistry 101.",
+      "D": "Lan must reserve lab equipment for Chemistry 101."
+    }
+  },
+  {
+    "record_id": 378,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Linh is not meeting the credit requirements for full-time students.",
+      "B": "Linh is meeting the credit requirements for full-time students.",
+      "C": "Linh needs to take more than 12 credits to meet the credit requirements.",
+      "D": "Linh is a part-time student."
+    }
+  },
+  {
+    "record_id": 379,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Hà is eligible for an internship because she has accumulated 80 credits.",
+      "B": "Hà is not eligible for an internship due to insufficient credits.",
+      "C": "Hà must take remedial courses before applying for the internship.",
+      "D": "Hà’s internship application was submitted after June 1st."
+    }
+  },
+  {
+    "record_id": 380,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Phong has an Excellent ranking.",
+      "B": "Phong has a Good ranking.",
+      "C": "Phong has an Average ranking.",
+      "D": "Phong is ranked Poor."
+    }
+  },
+  {
+    "record_id": 381,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Tâm is a second-year student.",
+      "B": "Tâm is in an accelerated program.",
+      "C": "Nam meets the language standard for year two.",
+      "D": "Tâm is eligible for the mentorship program."
+    }
+  },
+  {
+    "record_id": 382,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Phong is a third-year student.",
+      "B": "Phong has not met the foreign language standard for year three.",
+      "C": "Lan is eligible for study abroad.",
+      "D": "Phong has not completed the capstone project."
+    }
+  },
+  {
+    "record_id": 383,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "C": "Students working in groups neither gain nor lose performance.",
+      "D": "None of the above can be concluded."
+    }
+  },
+  {
+    "record_id": 384,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "It is not true that if every teacher is respected, then someone is prepared.",
+      "B": "Teachers are respected if they graduate from famous universities."
+    }
+  },
+  {
+    "record_id": 385,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "It is not true that If a student attends the seminar, they will be eligible for the certification.",
+      "B": "It is both true and false that If a student attends the seminar, they will be eligible for the certification.",
+      "C": "If a student attends the seminar, they will be eligible for the certification.",
+      "D": "If a student attends the seminar, they won't be eligible for the certification."
+    }
+  },
+  {
+    "record_id": 386,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "All students have attended the Software Engineering workshop.",
+      "B": "It is not true that All students have attended the Software Engineering workshop.",
+      "C": "It is both true and false that All students have attended the Software Engineering workshop.",
+      "D": "There are 2 students who have not attended the Software Engineering workshop."
+    }
+  },
+  {
+    "record_id": 387,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "B": "The negation of that implication.",
+      "C": "Both the implication and its negation are assumed true, which is a contradiction.",
+      "D": "The implication is assumed true and false at the same time."
+    }
+  },
+  {
+    "record_id": 388,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "All students in the AI program can build trustworthy systems.",
+      "B": "Some students who study AI ethics cannot build trustworthy systems.",
+      "C": "Following ethical guidelines ensures trustworthy systems.",
+      "D": "Studying AI ethics is optional for AI program students."
+    }
+  },
+  {
+    "record_id": 389,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "It is a tautology that completing the prerequisite course implies eligibility for the advanced courses.",
+      "B": "Completing the prerequisite course implies eligibility for advanced courses.",
+      "D": "It is not true that completing the prerequisite course implies eligibility for the advanced courses."
+    }
+  },
+  {
+    "record_id": 390,
+    "question_id": 1,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Participating in research, taking thesis course, being registered, receiving scholarship.",
+      "B": "Participating in research, being registered, honors program.",
+      "C": "Taking thesis course, receiving scholarship, honors program.",
+      "D": "Participating in research, taking thesis course, honors program."
+    }
+  },
+  {
+    "record_id": 391,
+    "question_id": 1,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Problem-solving, communication, critical thinking, teamwork, research skills.",
+      "B": "Problem-solving, communication, completing capstone project.",
+      "C": "Critical thinking, teamwork, research skills.",
+      "D": "Communication, critical thinking, completing capstone project."
+    }
+  },
+  {
+    "record_id": 392,
+    "question_id": 1,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Theoretical knowledge, presentation skills, writing thesis, receiving certificate.",
+      "B": "Completing final project, writing thesis, practical experience.",
+      "C": "Presentation skills, receiving certificate, practical experience.",
+      "D": "Theoretical knowledge, completing final project, presentation skills."
+    }
+  },
+  {
+    "record_id": 393,
+    "question_id": 1,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Good performance, high attendance, submitting thesis, submitting assignments.",
+      "B": "Good performance, submitting thesis, receiving feedback.",
+      "C": "High attendance, submitting assignments, receiving feedback.",
+      "D": "Passing course, good performance, submitting thesis."
+    }
+  },
+  {
+    "record_id": 394,
+    "question_id": 1,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Completing training module, participating in project, giving seminar, earning certification.",
+      "B": "Completing training module, writing paper, giving seminar.",
+      "C": "Participating in project, earning certification, writing paper.",
+      "D": "Completing training module, giving seminar, receiving recommendation."
+    }
+  },
+  {
+    "record_id": 395,
+    "question_id": 1,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Completing training module, participating in project, giving seminar, earning certification.",
+      "B": "Completing training module, writing paper, giving seminar.",
+      "C": "Participating in project, earning certification, writing paper.",
+      "D": "Completing training module, giving seminar, receiving recommendation."
+    }
+  },
+  {
+    "record_id": 396,
+    "question_id": 1,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Attending university, taking exam, submitting assignment, passing course, qualifying for graduation.",
+      "B": "Attending university, submitting assignment, completing research project.",
+      "C": "Taking exam, passing course, completing research project.",
+      "D": "Submitting assignment, qualifying for graduation, completing research project."
+    }
+  },
+  {
+    "record_id": 397,
+    "question_id": 1,
+    "type": "unparsed_options",
+    "options": {
+      "A": "GPA ≥ 3.7, eligible for scholarship, submitted personal statement, participated in extracurricular activities, submitted recommendation letter.",
+      "B": "GPA ≥ 3.7, submitted personal statement, participated in extracurricular activities, published research paper.",
+      "C": "Eligible for scholarship, submitted personal statement, submitted recommendation letter, published research paper.",
+      "D": "GPA ≥ 3.7, eligible for scholarship, participated in extracurricular activities, strong academic commitment."
+    }
+  },
+  {
+    "record_id": 398,
+    "question_id": 1,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Completing training session, submitting research proposal, presenting at seminar, meeting qualification criteria.",
+      "B": "Completing training session, submitting research proposal, enrolling in research program.",
+      "C": "Submitting research proposal, presenting at seminar, meeting qualification criteria.",
+      "D": "Completing training session, presenting at seminar, enrolling in research program."
+    }
+  },
+  {
+    "record_id": 399,
+    "question_id": 1,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Writing a motivation letter, participating in the exchange program, having a high TOEFL score.",
+      "B": "Writing a motivation letter, participating in the exchange program, applying for exchange.",
+      "C": "Having a high TOEFL score, receiving a scholarship, writing a motivation letter.",
+      "D": "Participating in the exchange program, having a high TOEFL score, receiving a scholarship."
+    }
+  },
+  {
+    "record_id": 400,
+    "question_id": 1,
+    "type": "unparsed_options",
+    "options": {
+      "A": "In dual degree program, GPA of 3.5 or higher, completing capstone project, completing thesis, qualifying for second degree.",
+      "B": "In dual degree program, completing capstone project, completing thesis, participating in leadership activities.",
+      "C": "Completing capstone project, completing thesis, qualifying for second degree, eligible for exchange.",
+      "D": "In dual degree program, GPA of 3.5 or higher, completing thesis, eligible for exchange."
+    }
+  },
+  {
+    "record_id": 401,
+    "question_id": 1,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Enrolling in an online course, accessing LMS, attending live sessions, viewing lecture recordings.",
+      "B": "Enrolling in an online course, accessing LMS, attending live sessions, joining discussion forums.",
+      "C": "Enrolling in an online course, viewing lecture recordings, joining discussion forums.",
+      "D": "Accessing LMS, attending live sessions, submitting final assignments."
+    }
+  },
+  {
+    "record_id": 402,
+    "question_id": 1,
+    "type": "unparsed_options",
+    "options": {
+      "A": "Completed foundational course, eligible for advanced coursework, submitted thesis, passed public speaking module, but not academic communication skills.",
+      "B": "Completed foundational course, eligible for advanced coursework, submitted thesis, academic communication skills, passed public speaking module.",
+      "C": "Completed foundational course, submitted thesis, academic communication skills, but not eligible for advanced coursework.",
+      "D": "Eligible for advanced coursework, academic communication skills, passed public speaking module, but not completed foundational course."
+    }
+  },
+  {
+    "record_id": 403,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "It is not true that if missing the deadline prevents course registration, then all students submitted their registration requests.",
+      "D": "The statement that missing the deadline prevents registration implies all students submitted registration requests is both true and false."
+    }
+  },
+  {
+    "record_id": 404,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "B": "It is not true that if some student is allowed to enroll, then passing Classical Mechanics allows taking Data Structures.",
+      "D": "The statement that if some student is allowed to enroll, then passing Classical Mechanics implies they can take Data Structures is both true and false."
+    }
+  },
+  {
+    "record_id": 405,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "∀x (F(x) → (W(x) ∧ R(x)))",
+      "B": "∀x (¬F(x) → W(x))",
+      "C": "∃x (¬A(x) ∧ W(x))",
+      "D": "∀x (R(x) → ¬G(x))"
+    }
+  },
+  {
+    "record_id": 406,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "∀x (A(x) → (R(x) ∧ P(x)))",
+      "B": "∀x (¬A(x) → R(x))",
+      "C": "∃x (¬R(x) ∧ P(x))",
+      "D": "∀x (S(x) → ¬P(x))"
+    }
+  },
+  {
+    "record_id": 407,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "∀x (E(x) → (A(x) ∧ N(x)))",
+      "B": "∃x (¬F(x) ∧ L(x))",
+      "C": "∀x (¬S(x) → A(x))",
+      "D": "∀x (N(x) → ¬E(x))"
+    }
+  },
+  {
+    "record_id": 408,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "∀x (H(x) → (E(x) ∧ A(x)))",
+      "B": "∃x (¬E(x) ∧ H(x))",
+      "C": "∀x (¬G(x) → A(x))",
+      "D": "∀x (P(x) → ¬I(x))"
+    }
+  },
+  {
+    "record_id": 409,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "∀x (C(x) → (U(x) ∧ W(x)))",
+      "B": "∃x (¬T(x) ∧ S(x))",
+      "C": "∀x (¬F(x) → W(x))",
+      "D": "∀x (S(x) → ¬U(x))"
+    }
+  },
+  {
+    "record_id": 410,
+    "question_id": 0,
+    "type": "unparsed_options",
+    "options": {
+      "A": "∀x (G(x) → (S(x) ∧ C(x)))",
+      "B": "∃x (¬O(x) ∧ R(x))",
+      "C": "∀x (¬B(x) → C(x))",
+      "D": "∀x (R(x) → ¬G(x))"
+    }
+  }
+]

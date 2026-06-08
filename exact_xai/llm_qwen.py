@@ -4,10 +4,11 @@ import os
 import torch
 
 class QwenGenerator:
-    def __init__(self, model_name: str = "Qwen/Qwen3-8B", load_4bit: bool = True):
+    def __init__(self, model_name: str = "Qwen/Qwen3-8B", load_4bit: bool = True, adapter_path: str | None = None):
         from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
         self.model_name = model_name
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
+        self.adapter_path = adapter_path
+        self.tokenizer = AutoTokenizer.from_pretrained(adapter_path or model_name, trust_remote_code=True)
         kwargs = dict(device_map="auto", trust_remote_code=True)
         if load_4bit:
             kwargs["quantization_config"] = BitsAndBytesConfig(
@@ -19,10 +20,15 @@ class QwenGenerator:
         else:
             kwargs["torch_dtype"] = torch.float16
         self.model = AutoModelForCausalLM.from_pretrained(model_name, **kwargs)
+        if adapter_path:
+            from peft import PeftModel
+            print(f"[llm] Loading LoRA adapter: {adapter_path}", flush=True)
+            self.model = PeftModel.from_pretrained(self.model, adapter_path)
         self.model.eval()
 
     @torch.inference_mode()
-    def generate(self, prompt: str, max_new_tokens: int = 256, temperature: float = 0.0) -> str:
+    def generate(self, prompt: str, max_new_tokens: int = 512, temperature: float = 0.0) -> str:
+        # Keep the compiler strict: no chain-of-thought request, JSON only.
         messages = [{"role": "user", "content": prompt}]
         inputs = self.tokenizer.apply_chat_template(
             messages,
@@ -43,9 +49,10 @@ def maybe_load_qwen() -> QwenGenerator | None:
     if os.environ.get("USE_LLM", "1") == "0":
         return None
     model_name = os.environ.get("MODEL_NAME", "Qwen/Qwen3-8B")
+    adapter_path = os.environ.get("ADAPTER_PATH") or None
     load_4bit = os.environ.get("LOAD_4BIT", "1") == "1"
     try:
-        return QwenGenerator(model_name=model_name, load_4bit=load_4bit)
+        return QwenGenerator(model_name=model_name, load_4bit=load_4bit, adapter_path=adapter_path)
     except ModuleNotFoundError as e:
         print(f"[warn] LLM dependencies missing ({e}); falling back to rule-based mode.", flush=True)
         return None

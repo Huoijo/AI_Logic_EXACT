@@ -1,0 +1,49 @@
+{
+  "dataset": "data/full_data.json",
+  "num_records": 411,
+  "question_type_counter": {
+    "multiple_choice": 359,
+    "yes_no": 224,
+    "open": 225
+  },
+  "splits": {
+    "train": {
+      "num_records": 328,
+      "num_samples": 5342,
+      "sample_type_counter": {
+        "premise_translation": 3613,
+        "record_premise_compiler": 328,
+        "question_intent": 644,
+        "silver_option_compiler": 113,
+        "full_compiler": 644,
+        "unparsed_options": 841
+      }
+    },
+    "valid": {
+      "num_records": 41,
+      "num_samples": 631,
+      "sample_type_counter": {
+        "premise_translation": 414,
+        "record_premise_compiler": 41,
+        "question_intent": 80,
+        "unparsed_options": 96,
+        "full_compiler": 80,
+        "silver_option_compiler": 16
+      }
+    },
+    "test": {
+      "num_records": 42,
+      "num_samples": 633,
+      "sample_type_counter": {
+        "premise_translation": 409,
+        "record_premise_compiler": 42,
+        "question_intent": 84,
+        "unparsed_options": 126,
+        "full_compiler": 84,
+        "silver_option_compiler": 14
+      }
+    }
+  },
+  "include_silver_options": true,
+  "num_noisy_cases": 302
+}
