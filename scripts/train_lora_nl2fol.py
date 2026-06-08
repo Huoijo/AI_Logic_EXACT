@@ -7,6 +7,7 @@ The training target is JSON-only compiler output, not final answers.
 from __future__ import annotations
 
 import argparse
+import inspect
 import json
 import os
 from pathlib import Path
@@ -15,9 +16,17 @@ from typing import Any
 import torch
 from datasets import load_dataset
 from peft import LoraConfig, prepare_model_for_kbit_training
-from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig, TrainingArguments
-from trl import SFTTrainer
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 from trl import SFTConfig, SFTTrainer
+
+
+def filter_supported_kwargs(callable_obj, kwargs: dict[str, Any]) -> dict[str, Any]:
+    """Keep only kwargs accepted by the installed library version."""
+    sig = inspect.signature(callable_obj)
+    params = sig.parameters
+    if any(p.kind == inspect.Parameter.VAR_KEYWORD for p in params.values()):
+        return kwargs
+    return {k: v for k, v in kwargs.items() if k in params}
 
 
 def parse_args() -> argparse.Namespace:
@@ -88,7 +97,7 @@ def main() -> None:
             bnb_4bit_use_double_quant=True,
         )
 
-    model_kwargs = {
+    model_kwargs: dict[str, Any] = {
         "device_map": "auto",
         "trust_remote_code": True,
     }
@@ -111,98 +120,56 @@ def main() -> None:
         target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
     )
 
-    training_args = TrainingArguments(
-        output_dir=str(out),
-        num_train_epochs=args.epochs,
-        per_device_train_batch_size=args.per_device_train_batch_size,
-        per_device_eval_batch_size=args.per_device_eval_batch_size,
-        gradient_accumulation_steps=args.gradient_accumulation_steps,
-        learning_rate=args.learning_rate,
-        logging_steps=10,
-        save_steps=args.save_steps,
-        eval_steps=args.eval_steps,
-        eval_strategy="steps",
-        save_strategy="steps",
-        save_total_limit=2,
-        fp16=True,
-        optim="paged_adamw_8bit" if quant_config is not None else "adamw_torch",
-        report_to="none",
-        gradient_checkpointing=True,
-        warmup_ratio=0.03,
-        lr_scheduler_type="cosine",
-    )
+    sft_config_kwargs: dict[str, Any] = {
+        "output_dir": str(out),
 
-    # TRL versions differ. Most recent versions use processing_class and max_seq_length in SFTConfig,
-    # older versions accept tokenizer/max_seq_length directly. Try the compatible path first.
-    try:
+        # TRL SFT-specific arguments.
+        "dataset_text_field": "text",
+        "max_length": args.max_seq_length,
+        "packing": False,
 
+        # Training arguments.
+        "num_train_epochs": args.epochs,
+        "per_device_train_batch_size": args.per_device_train_batch_size,
+        "per_device_eval_batch_size": args.per_device_eval_batch_size,
+        "gradient_accumulation_steps": args.gradient_accumulation_steps,
+        "learning_rate": args.learning_rate,
+        "logging_steps": 10,
+        "save_steps": args.save_steps,
+        "eval_steps": args.eval_steps,
+        "eval_strategy": "steps",
+        "save_strategy": "steps",
+        "save_total_limit": 2,
+        "fp16": True,
+        "bf16": False,
+        "optim": "paged_adamw_8bit" if quant_config is not None else "adamw_torch",
+        "report_to": "none",
+        "gradient_checkpointing": True,
+        "warmup_steps": 10,
+        "lr_scheduler_type": "cosine",
+        "remove_unused_columns": False,
+    }
 
-        sft_args = SFTConfig(
-            output_dir=str(output_dir),
-            dataset_text_field="text",
-            max_length=max_seq_length,
-            packing=False,
+    # Some TRL/Transformers versions use "evaluation_strategy" instead of "eval_strategy".
+    sig = inspect.signature(SFTConfig)
+    if "eval_strategy" not in sig.parameters and "evaluation_strategy" in sig.parameters:
+        sft_config_kwargs["evaluation_strategy"] = sft_config_kwargs.pop("eval_strategy")
 
-            per_device_train_batch_size=train_bs,
-            per_device_eval_batch_size=eval_bs,
-            gradient_accumulation_steps=grad_accum,
+    sft_args = SFTConfig(**filter_supported_kwargs(SFTConfig, sft_config_kwargs))
 
-            num_train_epochs=epochs,
-            learning_rate=learning_rate,
-            logging_steps=10,
-            save_steps=100,
-            eval_steps=100,
-            save_strategy="steps",
-            eval_strategy="steps",
+    trainer_kwargs: dict[str, Any] = {
+        "model": model,
+        "args": sft_args,
+        "train_dataset": ds["train"],
+        "eval_dataset": ds["validation"],
+        "peft_config": peft_config,
 
-            fp16=True,
-            bf16=False,
+        # Newer TRL uses processing_class; older TRL uses tokenizer.
+        "processing_class": tokenizer,
+        "tokenizer": tokenizer,
+    }
 
-            warmup_steps=10,
-            report_to="none",
-        )
-
-        trainer = SFTTrainer(
-            model=model,
-            args=sft_args,
-            train_dataset=train_dataset,
-            eval_dataset=valid_dataset,
-            processing_class=tokenizer,
-            peft_config=peft_config,
-        )
-    except TypeError:
-        from trl import SFTConfig
-        sft_args = SFTConfig(
-            output_dir=str(out),
-            num_train_epochs=args.epochs,
-            per_device_train_batch_size=args.per_device_train_batch_size,
-            per_device_eval_batch_size=args.per_device_eval_batch_size,
-            gradient_accumulation_steps=args.gradient_accumulation_steps,
-            learning_rate=args.learning_rate,
-            logging_steps=10,
-            save_steps=args.save_steps,
-            eval_steps=args.eval_steps,
-            eval_strategy="steps",
-            save_strategy="steps",
-            save_total_limit=2,
-            fp16=True,
-            optim="paged_adamw_8bit" if quant_config is not None else "adamw_torch",
-            report_to="none",
-            gradient_checkpointing=True,
-            warmup_ratio=0.03,
-            lr_scheduler_type="cosine",
-            dataset_text_field="text",
-            max_seq_length=args.max_seq_length,
-            packing=False,
-        )
-        trainer = SFTTrainer(
-            model=model,
-            args=sft_args,
-            train_dataset=ds["train"],
-            eval_dataset=ds["validation"],
-            peft_config=peft_config,
-            processing_class=tokenizer,
-        )
+    trainer = SFTTrainer(**filter_supported_kwargs(SFTTrainer.__init__, trainer_kwargs))
 
     trainer.train()
     trainer.save_model(str(out))
