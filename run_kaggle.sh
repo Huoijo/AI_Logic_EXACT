@@ -18,6 +18,7 @@ INPUT_MODE="${INPUT_MODE:-auto}"
 BATCH_SIZE="${BATCH_SIZE:-0}"
 LIMIT="${LIMIT:-}"
 RUN_ID="${RUN_ID:-$(date +%Y%m%d_%H%M%S)}"
+MODEL_NAME="${MODEL_NAME:-Qwen/Qwen3-8B}"
 
 KERNEL="huoijo/exact-kaggle-core-xai"
 BUILD_DIR=".kaggle_build"
@@ -126,6 +127,7 @@ INPUT_MODE="$INPUT_MODE" \
 BATCH_SIZE="$BATCH_SIZE" \
 LIMIT="$LIMIT" \
 RUN_ID="$RUN_ID" \
+MODEL_NAME="$MODEL_NAME" \
 python - <<'PY_PATCH'
 from pathlib import Path
 import os
@@ -140,6 +142,7 @@ replacements = {
     "BATCH_SIZE": os.environ.get("BATCH_SIZE", "0"),
     "LIMIT": os.environ.get("LIMIT", ""),
     "RUN_ID": os.environ.get("RUN_ID", ""),
+    "MODEL_NAME": os.environ.get("MODEL_NAME", "Qwen/Qwen3-8B"),
 }
 
 for key, val in replacements.items():
