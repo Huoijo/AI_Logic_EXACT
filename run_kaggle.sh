@@ -184,7 +184,19 @@ metadata_path.write_text(json.dumps(metadata, indent=2))
 PY_PATCH
 
 echo "[$(elapsed)] [3/5] Push Kaggle kernel"
-kaggle kernels push -p "$BUILD_DIR" --accelerator NvidiaTeslaT4
+
+PUSH_LOG="$(mktemp)"
+if ! kaggle kernels push -p "$BUILD_DIR" --accelerator NvidiaTeslaT4 2>&1 | tee "$PUSH_LOG"; then
+  echo "[$(elapsed)] [error] Kaggle kernel push failed. Not waiting for artifact."
+  cat "$PUSH_LOG"
+  exit 1
+fi
+
+if grep -Eiq "Kernel push error|Maximum .* session count|Permission .* denied|error:" "$PUSH_LOG"; then
+  echo "[$(elapsed)] [error] Kaggle reported a push error. Not waiting for artifact."
+  echo "Fix the issue above, usually by stopping active Kaggle GPU sessions."
+  exit 1
+fi
 
 echo "[$(elapsed)] [4/5] Wait for Kaggle artifact"
 mkdir -p "$OUT_DIR" "$ART_DIR"
