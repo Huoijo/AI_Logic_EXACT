@@ -10,3 +10,6 @@ artifacts/*.zip
 artifacts/*.tmp
 models/
 *.log
+artifacts/
+.kaggle_build/
+*.zip

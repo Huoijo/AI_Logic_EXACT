@@ -2,20 +2,27 @@
 set -euo pipefail
 
 # Usage:
-#   ./run_kaggle.sh smoke   # tiny unit smoke test, no LLM load
-#   ./run_kaggle.sh batch          # dataset batch with FOL if present
-#   ./run_kaggle.sh batch_nl       # force NL-premises -> logic -> answer
-#   ./run_kaggle.sh benchmark      # same as batch, but writes richer metrics
-# Optional env: INPUT_MODE=nl BATCH_SIZE=16 LIMIT=100 ./run_kaggle.sh benchmark
+#   ./run_kaggle.sh smoke
+#   ./run_kaggle.sh batch
+#   ./run_kaggle.sh batch_nl
+#   ./run_kaggle.sh benchmark
+#   ./run_kaggle.sh translate
+#
+# Optional env:
+#   INPUT_MODE=nl BATCH_SIZE=16 LIMIT=100 ./run_kaggle.sh benchmark
+#   RUN_ID=my_debug_run ./run_kaggle.sh batch_nl
 
 TASK="${1:-batch}"
 INPUT_MODE="${INPUT_MODE:-auto}"
 BATCH_SIZE="${BATCH_SIZE:-0}"
 LIMIT="${LIMIT:-}"
+RUN_ID="${RUN_ID:-$(date +%Y%m%d_%H%M%S)}"
+
 KERNEL="huoijo/exact-kaggle-core-xai"
 BUILD_DIR=".kaggle_build"
 OUT_DIR="kaggle_outputs"
 ART_DIR="artifacts"
+ARTIFACT_ZIP="exact_artifacts.zip"
 
 if ! command -v kaggle >/dev/null 2>&1; then
   echo "Kaggle CLI not found. Install with: pip install kaggle"
@@ -27,6 +34,26 @@ cleanup() {
 }
 trap cleanup EXIT
 
+echo "======================================"
+echo "EXACT Kaggle Core Runner"
+echo "TASK       = $TASK"
+echo "INPUT_MODE = $INPUT_MODE"
+echo "BATCH_SIZE = $BATCH_SIZE"
+echo "LIMIT      = ${LIMIT:-<none>}"
+echo "RUN_ID     = $RUN_ID"
+echo "KERNEL     = $KERNEL"
+echo "======================================"
+
+echo "[0/5] Ensure generated files are ignored"
+touch .gitignore
+
+grep -qxF "artifacts/" .gitignore || echo "artifacts/" >> .gitignore
+grep -qxF "kaggle_outputs/" .gitignore || echo "kaggle_outputs/" >> .gitignore
+grep -qxF ".kaggle_build/" .gitignore || echo ".kaggle_build/" >> .gitignore
+grep -qxF "*.zip" .gitignore || echo "*.zip" >> .gitignore
+
+git rm -r --cached artifacts kaggle_outputs .kaggle_build 2>/dev/null || true
+
 echo "[1/5] Commit and push current repo"
 git add .
 git commit -m "kaggle-core ${TASK}" || true
@@ -35,62 +62,109 @@ git push
 echo "[2/5] Build temporary Kaggle job folder"
 rm -rf "$BUILD_DIR"
 mkdir -p "$BUILD_DIR"
+
 cp kaggle_job/runner.py "$BUILD_DIR/runner.py"
 cp kaggle_job/kernel-metadata.json "$BUILD_DIR/kernel-metadata.json"
 
-TASK_FROM_SHELL="$TASK" INPUT_MODE="$INPUT_MODE" BATCH_SIZE="$BATCH_SIZE" LIMIT="$LIMIT" python - <<'PY_PATCH'
+TASK_FROM_SHELL="$TASK" \
+INPUT_MODE="$INPUT_MODE" \
+BATCH_SIZE="$BATCH_SIZE" \
+LIMIT="$LIMIT" \
+RUN_ID="$RUN_ID" \
+python - <<'PY_PATCH'
 from pathlib import Path
-import os, re
-p = Path('.kaggle_build/runner.py')
+import os
+import re
+
+p = Path(".kaggle_build/runner.py")
 s = p.read_text()
-task = os.environ['TASK_FROM_SHELL']
-s = re.sub(r'TASK = os\.environ\.get\("TASK", "[^"]+"\)', f'TASK = os.environ.get("TASK", "{task}")', s)
-# Bake in optional defaults for Kaggle runner. Env can still override inside Kaggle.
-for key in ["INPUT_MODE", "BATCH_SIZE", "LIMIT"]:
-    val = os.environ.get(key)
-    if val is not None:
-        pattern = rf'{key} = os\.environ\.get\("{key}", "[^"]*"\)'
-        s = re.sub(pattern, f'{key} = os.environ.get("{key}", "{val}")', s)
+
+replacements = {
+    "TASK": os.environ.get("TASK_FROM_SHELL", "batch"),
+    "INPUT_MODE": os.environ.get("INPUT_MODE", "auto"),
+    "BATCH_SIZE": os.environ.get("BATCH_SIZE", "0"),
+    "LIMIT": os.environ.get("LIMIT", ""),
+    "RUN_ID": os.environ.get("RUN_ID", ""),
+}
+
+for key, val in replacements.items():
+    # Replace existing: KEY = os.environ.get("KEY", "...")
+    pattern = rf'{key}\s*=\s*os\.environ\.get\("{key}",\s*"[^"]*"\)'
+    replacement = f'{key} = os.environ.get("{key}", "{val}")'
+
+    if re.search(pattern, s):
+        s = re.sub(pattern, replacement, s)
+    else:
+        # If runner.py does not define RUN_ID yet, inject after imports.
+        if key == "RUN_ID":
+            insert_after = "from pathlib import Path\n"
+            if insert_after in s:
+                s = s.replace(insert_after, insert_after + replacement + "\n", 1)
+            else:
+                s = replacement + "\n" + s
+
 p.write_text(s)
 PY_PATCH
 
 echo "[3/5] Push Kaggle kernel"
-TASK_FROM_SHELL="$TASK" INPUT_MODE="$INPUT_MODE" BATCH_SIZE="$BATCH_SIZE" LIMIT="$LIMIT" kaggle kernels push -p "$BUILD_DIR" --accelerator NvidiaTeslaT4
+kaggle kernels push -p "$BUILD_DIR" --accelerator NvidiaTeslaT4
 
 echo "[4/5] Wait for Kaggle artifact"
-
-mkdir -p kaggle_outputs artifacts
+mkdir -p "$OUT_DIR" "$ART_DIR"
 
 ATTEMPT=0
+MAX_ATTEMPTS="${MAX_ATTEMPTS:-90}"
+SLEEP_SECONDS="${SLEEP_SECONDS:-20}"
+
 while true; do
   ATTEMPT=$((ATTEMPT + 1))
+  echo "Trying to download ${ARTIFACT_ZIP}... attempt ${ATTEMPT}/${MAX_ATTEMPTS}"
 
-  echo "Trying to download exact_artifacts.zip... attempt $ATTEMPT"
-
-  rm -f kaggle_outputs/exact_artifacts.zip
+  rm -f "${OUT_DIR}/${ARTIFACT_ZIP}"
 
   if kaggle kernels output "$KERNEL" \
-      -p kaggle_outputs \
+      -p "$OUT_DIR" \
       -o \
-      --file-pattern '^exact_artifacts\.zip$'; then
+      --file-pattern "^${ARTIFACT_ZIP}$"; then
 
-    if [ -f "kaggle_outputs/exact_artifacts.zip" ]; then
-      echo "[ok] exact_artifacts.zip downloaded."
+    if [ -f "${OUT_DIR}/${ARTIFACT_ZIP}" ]; then
+      echo "[ok] ${ARTIFACT_ZIP} downloaded."
       break
     fi
   fi
 
-  if [ "$ATTEMPT" -ge 60 ]; then
-    echo "[error] Could not download exact_artifacts.zip after 60 attempts."
-    echo "Open Kaggle web page to check whether the kernel failed or output file was not produced."
+  if [ "$ATTEMPT" -ge "$MAX_ATTEMPTS" ]; then
+    echo "[error] Could not download ${ARTIFACT_ZIP} after ${MAX_ATTEMPTS} attempts."
+    echo "Open Kaggle web page to check whether the kernel failed or output file was not produced:"
+    echo "https://www.kaggle.com/code/${KERNEL}"
     exit 1
   fi
 
-  sleep 20
+  sleep "$SLEEP_SECONDS"
 done
 
 echo "[5/5] Extract artifacts"
-rm -rf artifacts
-mkdir -p artifacts
-unzip -o kaggle_outputs/exact_artifacts.zip -d artifacts
-echo "Done. Check artifacts/"
+rm -rf "$ART_DIR"
+mkdir -p "$ART_DIR"
+unzip -o "${OUT_DIR}/${ARTIFACT_ZIP}" -d "$ART_DIR"
+
+# Optional stale-artifact protection.
+# This requires kaggle_job/runner.py to write outputs/run_id.txt into the zip.
+if [ -f "${ART_DIR}/run_id.txt" ]; then
+  GOT_RUN_ID="$(cat "${ART_DIR}/run_id.txt" | tr -d '\n\r')"
+  if [ "$GOT_RUN_ID" != "$RUN_ID" ]; then
+    echo "[error] Downloaded artifact run_id=${GOT_RUN_ID}, expected ${RUN_ID}."
+    echo "This looks like a stale artifact from a previous Kaggle run."
+    exit 1
+  fi
+  echo "[ok] run_id verified: ${GOT_RUN_ID}"
+else
+  echo "[warn] artifacts/run_id.txt not found. Cannot verify whether artifact is stale."
+fi
+
+echo "Done. Check ${ART_DIR}/"
+if [ -f "${ART_DIR}/eval_report.json" ]; then
+  echo "----- eval_report.json -----"
+  cat "${ART_DIR}/eval_report.json"
+  echo
+fi
