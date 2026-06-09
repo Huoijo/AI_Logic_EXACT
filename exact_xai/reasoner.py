@@ -13,21 +13,71 @@ class ReasonResult:
     derived_facts: set[Atom] = field(default_factory=set)
     warnings: list[str] = field(default_factory=list)
 
+def _num_from_token(x: str) -> float | None:
+    import re
+    m = re.search(r"(\d+(?:_\d+|\.\d+)?)", str(x))
+    if not m:
+        return None
+    try:
+        return float(m.group(1).replace("_", "."))
+    except Exception:
+        return None
+
+
+def _numeric_pred_parts(pred: str):
+    """Return skeleton and threshold for predicates like completing_600_hours."""
+    import re
+    m = re.match(r"^(.*?)(\d+(?:_\d+)?)(.*)$", pred)
+    if not m:
+        return None
+    prefix, num, suffix = m.groups()
+    try:
+        val = float(num.replace("_", "."))
+    except Exception:
+        return None
+    return prefix, suffix, val
+
+
+def _pred_entails(fact_pred: str, pattern_pred: str) -> bool:
+    if fact_pred == pattern_pred:
+        return True
+    fp = _numeric_pred_parts(fact_pred)
+    pp = _numeric_pred_parts(pattern_pred)
+    if fp and pp and fp[0] == pp[0] and fp[1] == pp[1]:
+        return fp[2] >= pp[2]
+    # completing_600_clinical_hours entails completing_500_clinical_hours.
+    return False
+
+
+def _args_match(pattern_args, fact_args, env: dict[str, str]) -> bool:
+    if len(pattern_args) != len(fact_args):
+        return False
+    for pa, fa in zip(pattern_args, fact_args):
+        # Numeric threshold in second argument: completed_courses(x,5) matches completed_courses(Sarah,4) only if 4 >= 5.
+        if is_var(pa):
+            if pa in env and env[pa] != fa:
+                return False
+            env[pa] = fa
+        elif pa != fa:
+            pn = _num_from_token(pa)
+            fn = _num_from_token(fa)
+            if pn is not None and fn is not None:
+                if fn < pn:
+                    return False
+            else:
+                return False
+    return True
+
+
 def _match_fact(pattern: Atom, facts: set[Atom]) -> list[dict[str, str]]:
     envs = []
     for f in facts:
-        if f.pred != pattern.pred or f.negated != pattern.negated or len(f.args) != len(pattern.args):
+        if f.negated != pattern.negated or len(f.args) != len(pattern.args):
+            continue
+        if not _pred_entails(f.pred, pattern.pred):
             continue
         env: dict[str, str] = {}
-        ok = True
-        for pa, fa in zip(pattern.args, f.args):
-            if is_var(pa):
-                if pa in env and env[pa] != fa:
-                    ok = False; break
-                env[pa] = fa
-            elif pa != fa:
-                ok = False; break
-        if ok:
+        if _args_match(pattern.args, f.args, env):
             envs.append(env)
     return envs
 
@@ -114,7 +164,44 @@ class Reasoner:
             proof = self._trace_proof(neg_target, proofs)
             used = sorted({p for st in proof for p in st.used_premises})
             return ReasonResult("No", proof, used, facts)
+        blocked = self._blocked_by_negated_requirement(target, facts, seen=set())
+        if blocked:
+            note = f"Blocked by negated requirement while trying to prove {target}: {blocked}"
+            proof = [ProofStep(derived=f"not {target}", rule_id=None, used=[blocked], used_premises=[], note=note)]
+            return ReasonResult("No", proof, [], facts, ["blocked_by_negated_requirement"])
         return ReasonResult("Uncertain", [], [], facts, [f"Could not prove {target} or its negation."])
+
+    def _unify_consequent(self, pattern: Atom, target: Atom) -> dict[str, str] | None:
+        if pattern.pred != target.pred or pattern.negated != target.negated or len(pattern.args) != len(target.args):
+            return None
+        env: dict[str, str] = {}
+        for pa, ta in zip(pattern.args, target.args):
+            if is_var(pa):
+                env[pa] = ta
+            elif pa != ta:
+                return None
+        return env
+
+    def _blocked_by_negated_requirement(self, target: Atom, facts: set[Atom], seen: set[Atom]) -> str | None:
+        if target in seen:
+            return None
+        seen.add(target)
+        direct_neg = Atom(target.pred, target.args, not target.negated)
+        if direct_neg in facts:
+            return str(direct_neg)
+        for rule in self.kb.rules:
+            env = self._unify_consequent(rule.consequent, target)
+            if env is None:
+                continue
+            for ant in rule.antecedents:
+                grounded = ant.substitute(env)
+                neg = Atom(grounded.pred, grounded.args, not grounded.negated)
+                if neg in facts:
+                    return str(neg)
+                nested = self._blocked_by_negated_requirement(grounded, facts, seen)
+                if nested:
+                    return nested
+        return None
 
     def _trace_proof(self, target: Atom, proofs: dict[Atom, ProofStep], seen: set[Atom] | None = None) -> list[ProofStep]:
         seen = seen or set()

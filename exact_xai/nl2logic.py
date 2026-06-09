@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from .fol import parse_fol_premises
+from .fol_repair import repair_fol_list, strict_fol_warnings
 
 
 @dataclass
@@ -30,17 +31,23 @@ def make_nl2logic_prompt(premises_nl: list[str], question: str | None = None) ->
     return f"""
 You are an NL-to-logic compiler for a proof-based QA system.
 Convert every natural-language premise into a compact FOL-like string that this grammar accepts:
-- Facts: predicate(Entity)
+- Facts: predicate(Entity), e.g. completed_course_a(David)
 - Universal rules: ForAll(x, antecedent(x) -> consequent(x))
 - Conjunction: A(x) & B(x)
 - Negation: not A(x)
 - Existential facts: Exists(x, predicate(x))
+- Numeric thresholds as predicates: clinical_hours_at_least_500(x), membership_duration_at_least_6_months(x)
 
 Rules:
 - Use snake_case predicate names.
 - Use the same predicate name for the same concept across all premises.
 - Preserve premise order: output exactly one FOL string per input premise.
 - Do not answer the question.
+- NEVER write object-method syntax such as John.completed_course_a or x.enrolled_in_b.
+- NEVER write English-call syntax such as John completed_courses(). Use completed_courses(John).
+- If a fact says "John has not received a safety endorsement", output not received_safety_endorsement(John), not not_received_safety_endorsement(John).
+- If a requirement says "at least 500 hours" and a fact says "600 hours", use comparable threshold predicates such as clinical_hours_at_least_500(x) and clinical_hours_at_least_600(John).
+- "may qualify" / "opens the possibility" should be possible_qualifies_..., not guaranteed qualifies_....
 - Return ONLY valid JSON.
 
 JSON schema:
@@ -114,15 +121,23 @@ def heuristic_translate_premises(premises_nl: list[str]) -> NL2LogicResult:
     return NL2LogicResult(fol, warnings=["used_heuristic_nl2logic"])
 
 
-def validate_fol_list(premises_fol: list[str]) -> tuple[bool, list[str]]:
+def validate_fol_list(premises_fol: list[str]) -> tuple[bool, list[str], list[str]]:
     warnings = []
     if not isinstance(premises_fol, list) or not all(isinstance(x, str) for x in premises_fol):
-        return False, ["premises_fol_not_list_of_strings"]
+        return False, ["premises_fol_not_list_of_strings"], []
+    rep = repair_fol_list(premises_fol)
+    warnings.extend(rep.warnings)
+    fatal = []
+    for i, x in enumerate(rep.repaired, start=1):
+        bad = [w for w in strict_fol_warnings(x) if w not in {"not_prefix_predicate"}]
+        fatal.extend(f"premise_{i}_{w}" for w in bad)
+    if fatal:
+        return False, warnings + fatal, rep.repaired
     try:
-        parse_fol_premises(premises_fol)
+        parse_fol_premises(rep.repaired)
     except Exception as e:
-        return False, [f"fol_parse_error: {type(e).__name__}: {e}"]
-    return True, warnings
+        return False, warnings + [f"fol_parse_error: {type(e).__name__}: {e}"], rep.repaired
+    return True, warnings, rep.repaired
 
 
 def translate_nl_to_fol(premises_nl: list[str], question: str | None = None, llm=None) -> NL2LogicResult:
@@ -136,20 +151,20 @@ def translate_nl_to_fol(premises_nl: list[str], question: str | None = None, llm
             obj = _extract_json(text)
             if isinstance(obj, dict):
                 fol = obj.get("premises_fol") or obj.get("premises-FOL") or []
-                ok, warns = validate_fol_list(fol)
-                if ok and len(fol) == len(premises_nl):
-                    return NL2LogicResult(fol, warnings=warns, raw={"llm_text": text})
+                ok, warns, repaired = validate_fol_list(fol)
+                if ok and len(repaired) == len(premises_nl):
+                    return NL2LogicResult(repaired, warnings=warns, raw={"llm_text": text})
                 if ok:
-                    return NL2LogicResult(fol, warnings=warns + ["nl2logic_count_mismatch"], raw={"llm_text": text})
+                    return NL2LogicResult(repaired, warnings=warns + ["nl2logic_count_mismatch"], raw={"llm_text": text})
                 # one repair attempt: ask it to fix only format/count.
                 repair_prompt = prompt + "\n\nYour previous output was invalid. Return valid JSON only with exactly one FOL string per premise. Previous output:\n" + text
                 text2 = llm.generate(repair_prompt, max_new_tokens=1024, temperature=0.0)
                 obj2 = _extract_json(text2)
                 if isinstance(obj2, dict):
                     fol2 = obj2.get("premises_fol") or obj2.get("premises-FOL") or []
-                    ok2, warns2 = validate_fol_list(fol2)
+                    ok2, warns2, repaired2 = validate_fol_list(fol2)
                     if ok2:
-                        return NL2LogicResult(fol2, warnings=warns2 + ["nl2logic_repaired"], raw={"llm_text": text, "repair_text": text2})
+                        return NL2LogicResult(repaired2, warnings=warns2 + ["nl2logic_repaired"], raw={"llm_text": text, "repair_text": text2})
         except Exception as e:
             return heuristic_translate_premises(premises_nl)
 

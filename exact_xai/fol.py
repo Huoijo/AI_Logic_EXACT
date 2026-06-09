@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 import re
+from .fol_repair import repair_fol_string, normalize_predicate_name, normalize_entity_name
 
 VAR_NAMES = {"x", "y", "z", "s", "student", "project", "code"}
 
@@ -119,16 +120,22 @@ def split_top_level(s: str, sep: str) -> list[str]:
 ATOM_RE = re.compile(r"^(not\s+)?([A-Za-z_]\w*)\s*\((.*)\)\s*$")
 
 def parse_atom(s: str) -> Atom:
-    s = strip_outer_parens(s.strip())
+    s = repair_fol_string(strip_outer_parens(s.strip()))
     s = s.replace("¬", "not ")
     m = ATOM_RE.match(s)
     if not m:
         name = re.sub(r"\W+", "_", s).strip("_") or "unknown"
+        name = normalize_predicate_name(name)
+        if name.startswith("not_"):
+            return Atom(normalize_predicate_name(name[4:]), (), True)
         return Atom(name, ())
     neg = bool(m.group(1))
-    pred = m.group(2)
+    pred = normalize_predicate_name(m.group(2))
+    if pred.startswith("not_"):
+        neg = True
+        pred = normalize_predicate_name(pred[4:])
     args_raw = m.group(3).strip()
-    args = tuple(a.strip() for a in args_raw.split(",") if a.strip()) if args_raw else ()
+    args = tuple(normalize_entity_name(a.strip()) for a in args_raw.split(",") if a.strip()) if args_raw else ()
     return Atom(pred, args, neg)
 
 def parse_conjunction(s: str) -> list[Atom]:
@@ -136,6 +143,7 @@ def parse_conjunction(s: str) -> list[Atom]:
     return [parse_atom(p) for p in split_top_level(s, "&")]
 
 def parse_fol_statement(text: str, source_id: int) -> tuple[list[Atom], list[Rule]]:
+    text = repair_fol_string(text)
     body, quant = unwrap_quantifier(text)
     body = strip_outer_parens(body)
     facts: list[Atom] = []
@@ -146,14 +154,15 @@ def parse_fol_statement(text: str, source_id: int) -> tuple[list[Atom], list[Rul
         cons = parse_atom(right)
         rules.append(Rule(ants, cons, source_id, text))
     else:
-        atom = parse_atom(body)
-        if quant == "forall" and atom.variables:
-            rules.append(Rule([], atom, source_id, text))
-        elif quant == "exists" and atom.variables:
-            env = {v: f"EXISTS_{source_id}" for v in atom.variables}
-            facts.append(atom.substitute(env))
-        else:
-            facts.append(atom)
+        atoms = parse_conjunction(body) if "&" in body else [parse_atom(body)]
+        for atom in atoms:
+            if quant == "forall" and atom.variables:
+                rules.append(Rule([], atom, source_id, text))
+            elif quant == "exists" and atom.variables:
+                env = {v: f"EXISTS_{source_id}" for v in atom.variables}
+                facts.append(atom.substitute(env))
+            else:
+                facts.append(atom)
     return facts, rules
 
 def parse_fol_premises(premises_fol: list[str], premises_nl: list[str] | None = None) -> KnowledgeBase:

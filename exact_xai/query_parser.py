@@ -7,6 +7,7 @@ from typing import Any
 from rapidfuzz import fuzz
 
 from .fol import Atom, KnowledgeBase, parse_atom
+from .fol_repair import repair_fol_string, normalize_predicate_name
 from .schemas import ParsedQuestion
 
 # Match EXACT-style MCQ options of the form A. ... B. ... C. ... D. ...
@@ -69,6 +70,13 @@ DOMAIN_REWRITES = {
     "state lines": "state_lines",
     "standard goods": "standard_goods",
     "safety endorsement": "safety_endorsement",
+    "research fellowship program": "graduate_fellowship_program",
+    "graduate fellowship program": "graduate_fellowship_program",
+    "academic papers": "publications",
+    "personal training sessions": "book_training",
+    "training sessions": "book_training",
+    "advanced classes": "advanced_classes",
+    "clinical hours": "clinical_hours",
 }
 
 
@@ -87,15 +95,7 @@ def _snake(s: str) -> str:
 
 def normalize_logic_value(s: str) -> str:
     """Normalize model-produced logic strings into parser/Z3-friendly syntax."""
-    s = str(s).strip()
-    s = s.replace("∀", "ForAll")
-    s = s.replace("∃", "Exists")
-    s = s.replace("→", "->")
-    s = s.replace("=>", "->")
-    s = s.replace("¬", "not ")
-    s = s.replace("∧", "&")
-    s = re.sub(r"\s+", " ", s).strip()
-    return s
+    return repair_fol_string(str(s).strip())
 
 
 def extract_choices(question: str) -> dict[str, str]:
@@ -205,19 +205,24 @@ def _clean_phrase(text: str) -> str:
 
 def _phrase_to_atom_formula(text: str, kb: KnowledgeBase, arg: str = "x") -> str | None:
     neg = _is_negated(text)
-    # "needs X" means we query X, not negation.
-    needs_mode = bool(re.search(r"\bneeds?\b", text, flags=re.I))
-    cleaned = _clean_phrase(_remove_negation_words(text) if (neg or needs_mode) else text)
+    needs_more = bool(re.search(r"\bneeds?\s+(more|additional|longer|extra)\b", text, flags=re.I))
+    needs_plain = bool(re.search(r"\bneeds?\b", text, flags=re.I)) and not needs_more
+    cleaned = _clean_phrase(_remove_negation_words(text) if (neg or needs_plain or needs_more) else text)
     pred = best_predicate_from_text(cleaned, kb) or best_predicate_from_text(text, kb)
     if not pred:
         return None
-    if neg and not needs_mode:
+    pred = normalize_predicate_name(pred)
+    # "needs more/additional X" means the positive requirement is not yet satisfied.
+    if needs_more:
+        return f"not {pred}({arg})"
+    # "needs X" often asks whether X is the missing requirement, so query X itself.
+    if neg and not needs_plain:
         return f"not {pred}({arg})"
     return f"{pred}({arg})"
 
 
-def _phrase_to_atom(text: str, kb: KnowledgeBase) -> str | None:
-    const = best_constant_from_text(text, kb) or _default_constant(kb)
+def _phrase_to_atom(text: str, kb: KnowledgeBase, default_const: str | None = None) -> str | None:
+    const = best_constant_from_text(text, kb) or default_const or _default_constant(kb)
     return _phrase_to_atom_formula(text, kb, const)
 
 
@@ -259,12 +264,13 @@ def parse_question_rule_based(question: str, kb: KnowledgeBase) -> ParsedQuestio
     choices = extract_choices(question)
     if choices:
         parsed_choices: dict[str, str] = {}
+        context_const = best_constant_from_text(question, kb)
         for label, text in choices.items():
             conditional = _parse_conditional_as_forall(text, kb)
             if conditional:
                 parsed_choices[label] = conditional
                 continue
-            atom = _phrase_to_atom(text, kb)
+            atom = _phrase_to_atom(text, kb, context_const)
             parsed_choices[label] = atom if atom else _snake(text)
         return ParsedQuestion(kind="multiple_choice", choices=parsed_choices, parser="rule_based")
 
@@ -398,6 +404,16 @@ def postprocess_parsed_question(question: str, kb: KnowledgeBase, parsed: Parsed
             if conditional and parsed.target != conditional:
                 parsed.target = conditional
                 post_warnings.append("normalized_yes_no_conditional_target")
+
+        # If the source is not an explicit conditional/statement question, reject hallucinated ForAll targets.
+        if parsed.target and ("->" in parsed.target or parsed.target.lower().startswith("forall")):
+            qlow = question.lower()
+            has_statement = "statement:" in qlow or _extract_embedded_conditional(question) is not None
+            if not has_statement and any(k in qlow for k in ["meet", "meets", "can ", "qualify", "eligible", "demonstrate"]):
+                atom = _phrase_to_atom(question, kb)
+                if atom:
+                    parsed.target = atom
+                    post_warnings.append("normalized_yes_no_forall_to_atom")
         parsed.raw = {**parsed.raw, "postprocess_warnings": post_warnings}
         return parsed
 
@@ -409,10 +425,11 @@ def postprocess_parsed_question(question: str, kb: KnowledgeBase, parsed: Parsed
         return rb
 
     fixed: dict[str, str] = {}
+    context_const = best_constant_from_text(question, kb)
     for label, option_text in choices_text.items():
         model_value = normalize_logic_value(parsed.choices.get(label, ""))
         option_is_conditional = _is_explicit_conditional(option_text)
-        option_const = best_constant_from_text(option_text, kb)
+        option_const = best_constant_from_text(option_text, kb) or context_const
 
         if option_is_conditional:
             # Explicit conditionals should be ForAll implications. If the model failed,
@@ -427,7 +444,7 @@ def postprocess_parsed_question(question: str, kb: KnowledgeBase, parsed: Parsed
 
         # Factual entity options should be atoms. ForAll here is usually a hallucinated rule.
         if option_const or model_value.lower().startswith("forall") or "->" in model_value:
-            atom = _phrase_to_atom(option_text, kb)
+            atom = _phrase_to_atom(option_text, kb, context_const)
             if atom:
                 fixed[label] = atom
                 if model_value and model_value != atom:
@@ -438,7 +455,7 @@ def postprocess_parsed_question(question: str, kb: KnowledgeBase, parsed: Parsed
         if model_value and "->" not in model_value:
             fixed[label] = model_value
         else:
-            atom = _phrase_to_atom(option_text, kb)
+            atom = _phrase_to_atom(option_text, kb, context_const)
             fixed[label] = atom if atom else (model_value or _snake(option_text))
             post_warnings.append(f"option_{label}_fallback_atom")
 

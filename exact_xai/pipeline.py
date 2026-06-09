@@ -10,6 +10,7 @@ from .query_parser import (
 from .nl2logic import translate_nl_to_fol
 from .explanation import proof_to_explanation
 from .solvers.z3_backend import Z3Backend
+from .requirement_reasoner import question_requests_requirements, requirement_gap_check
 
 
 class AnswerPipeline:
@@ -47,7 +48,7 @@ class AnswerPipeline:
                 pass
         return parse_question_rule_based(req.question, kb)
 
-    def prove_query(self, query: str | None, reasoner: Reasoner, z3_backend: Z3Backend | None) -> ReasonResult:
+    def prove_query(self, query: str | None, reasoner: Reasoner, z3_backend: Z3Backend | None, question: str | None = None) -> ReasonResult:
         if not query:
             return ReasonResult("Uncertain", warnings=["empty_query"])
         q = query.strip()
@@ -65,6 +66,10 @@ class AnswerPipeline:
             zr = z3_backend.prove_query_string(q)
             if zr.answer != "Uncertain":
                 return zr
+        if rr.answer == "Uncertain" and question and question_requests_requirements(question):
+            gap = requirement_gap_check(reasoner.kb, atom, reasoner)
+            if gap is not None:
+                return gap
         return rr
 
     def answer(self, req: AnswerRequest) -> AnswerResponse:
@@ -90,7 +95,7 @@ class AnswerPipeline:
                 warnings.append("duplicate_choice_targets")
 
             for label, query in parsed.choices.items():
-                option_results[label] = self.prove_query(query, reasoner, z3_backend)
+                option_results[label] = self.prove_query(query, reasoner, z3_backend, req.question)
 
             yes_options = [k for k, v in option_results.items() if v and v.answer == "Yes"]
             if len(yes_options) == 1:
@@ -124,7 +129,7 @@ class AnswerPipeline:
                 raw={**raw, "option_results": {k: (v.answer if v else None) for k, v in option_results.items()}},
             )
 
-        rr = self.prove_query(parsed.target, reasoner, z3_backend)
+        rr = self.prove_query(parsed.target, reasoner, z3_backend, req.question)
         explanation = proof_to_explanation(rr.answer, rr.proof, req.premises_nl, rr.warnings + warnings)
         return AnswerResponse(
             id=req.id,
