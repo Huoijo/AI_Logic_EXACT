@@ -5,7 +5,7 @@ from .fol import parse_fol_premises, parse_atom
 from .reasoner import Reasoner, ReasonResult
 from .query_parser import (
     parse_question_rule_based, make_llm_prompt, parse_llm_json,
-    parsed_target_to_atom,
+    parsed_target_to_atom, postprocess_parsed_question,
 )
 from .nl2logic import translate_nl_to_fol
 from .explanation import proof_to_explanation
@@ -42,7 +42,7 @@ class AnswerPipeline:
                 text = self.llm.generate(prompt, max_new_tokens=512, temperature=0.0)
                 parsed = parse_llm_json(text)
                 if parsed and (parsed.target or parsed.choices):
-                    return parsed
+                    return postprocess_parsed_question(req.question, kb, parsed)
             except Exception:
                 pass
         return parse_question_rule_based(req.question, kb)
@@ -70,6 +70,8 @@ class AnswerPipeline:
     def answer(self, req: AnswerRequest) -> AnswerResponse:
         kb, warnings, raw = self.build_kb(req)
         parsed = self.parse_question(req, kb)
+        if parsed and parsed.raw.get("postprocess_warnings"):
+            warnings.extend(parsed.raw.get("postprocess_warnings") or [])
         reasoner = Reasoner(kb)
         z3_backend = Z3Backend(kb) if self.use_z3 else None
 
@@ -96,7 +98,10 @@ class AnswerPipeline:
                 rr = option_results[chosen]
                 answer = chosen
             elif len(yes_options) > 1:
-                chosen = sorted(yes_options, key=lambda k: len(option_results[k].proof))[0]
+                def _choice_score(k: str):
+                    rr_k = option_results[k]
+                    return (len(rr_k.used_premises), len(rr_k.proof), k)
+                chosen = sorted(yes_options, key=_choice_score)[0]
                 rr = option_results[chosen]
                 answer = chosen
                 warnings.append(f"multiple_provable_options:{yes_options};selected:{chosen}")

@@ -9,11 +9,7 @@ from rapidfuzz import fuzz
 from .fol import Atom, KnowledgeBase, parse_atom
 from .schemas import ParsedQuestion
 
-# Match MCQ options of the form:
-# A. ...
-# B. ...
-# C. ...
-# D. ...
+# Match EXACT-style MCQ options of the form A. ... B. ... C. ... D. ...
 CHOICE_RE = re.compile(r"(?m)^\s*([A-D])\.\s*(.+?)(?=\n\s*[A-D]\.\s*|\Z)", re.S)
 YES_NO_STARTERS = (
     "does ", "do ", "is ", "are ", "can ", "could ",
@@ -32,7 +28,55 @@ NEGATION_PATTERNS = (
     r"\bare\s+not\b",
     r"\bhas\s+not\b",
     r"\bhave\s+not\b",
+    r"\bneeds?\b",  # options like "needs recommendation" usually query the requirement fact
 )
+
+DOMAIN_REWRITES = {
+    "pep 8": "pep8",
+    "pep-8": "pep8",
+    "well tested": "well_tested",
+    "well-tested": "well_tested",
+    "well structured": "well_structured",
+    "well-structured": "well_structured",
+    "clean and readable": "clean_readable",
+    "clean readable": "clean_readable",
+    "clean code": "clean_code",
+    "easy to maintain": "easy_to_maintain",
+    "international program": "international_program",
+    "university scholarship": "university_scholarship",
+    "scholarship": "scholarship",
+    "honors diploma": "honors_diploma",
+    "advanced courses": "advanced_courses",
+    "faculty recommendation": "faculty_recommendation",
+    "language proficiency": "language_proficiency",
+    "capstone project": "capstone_project",
+    "community service": "community_service",
+    "core curriculum": "core_curriculum",
+    "science assessment": "science_assessment",
+    "research methodology": "research_methodology",
+    "graduate fellowship": "graduate_fellowship",
+    "academic distinction": "academic_distinction",
+    "graduate courses": "graduate_courses",
+    "undergraduate courses": "undergraduate_courses",
+    "research mentor": "research_mentor",
+    "curriculum committees": "curriculum_committees",
+    "new courses": "new_courses",
+    "restricted archives": "restricted_archives",
+    "research proposals": "research_proposals",
+    "collaborative research projects": "collaborative_research_projects",
+    "hazardous materials": "hazardous_materials",
+    "hazardous cargo": "hazardous_cargo",
+    "state lines": "state_lines",
+    "standard goods": "standard_goods",
+    "safety endorsement": "safety_endorsement",
+}
+
+
+def normalize_text_for_matching(s: str) -> str:
+    s = str(s).lower()
+    for a, b in DOMAIN_REWRITES.items():
+        s = s.replace(a, b)
+    return s
 
 
 def _snake(s: str) -> str:
@@ -41,38 +85,8 @@ def _snake(s: str) -> str:
     return s.strip("_")
 
 
-def normalize_text_for_matching(s: str) -> str:
-    """Normalize only for fuzzy matching, not for final FOL syntax."""
-    s = s.lower()
-    replacements = {
-        "pep 8": "pep8",
-        "pep-8": "pep8",
-        "well tested": "well_tested",
-        "well-tested": "well_tested",
-        "well structured": "well_structured",
-        "well-structured": "well_structured",
-        "clean and readable": "clean_readable",
-        "clean readable": "clean_readable",
-        "easy to maintain": "easy_to_maintain",
-        "international program": "international_program",
-        "university scholarship": "university_scholarship",
-        "honors diploma": "honors_diploma",
-        "advanced courses": "advanced_courses",
-        "faculty recommendation": "faculty_recommendation",
-        "language proficiency": "language_proficiency",
-        "capstone project": "capstone_project",
-        "community service": "community_service",
-        "core curriculum": "core_curriculum",
-        "science assessment": "science_assessment",
-        "research methodology": "research_methodology",
-    }
-    for a, b in replacements.items():
-        s = s.replace(a, b)
-    return s
-
-
 def normalize_logic_value(s: str) -> str:
-    """Normalize model-produced logic strings into parser-friendly syntax."""
+    """Normalize model-produced logic strings into parser/Z3-friendly syntax."""
     s = str(s).strip()
     s = s.replace("∀", "ForAll")
     s = s.replace("∃", "Exists")
@@ -90,13 +104,11 @@ def extract_choices(question: str) -> dict[str, str]:
 
 def has_mcq_options(question: str) -> bool:
     choices = extract_choices(question)
-    # EXACT Type 1 MCQ is A-D. Require A and B at minimum for detection.
     return "A" in choices and "B" in choices
 
 
 def looks_yes_no(question: str) -> bool:
-    q = question.strip().lower()
-    return q.startswith(YES_NO_STARTERS)
+    return question.strip().lower().startswith(YES_NO_STARTERS)
 
 
 def predicates(kb: KnowledgeBase) -> set[str]:
@@ -123,11 +135,7 @@ def _default_constant(kb: KnowledgeBase) -> str:
     return cs[0] if cs else "GENERIC"
 
 
-def best_predicate_from_text(text: str, kb: KnowledgeBase) -> str | None:
-    """Map a natural-language phrase to the closest predicate in the KB.
-
-    This remains a fallback. Strong model-produced FOL should be preferred.
-    """
+def best_predicate_from_text(text: str, kb: KnowledgeBase, threshold: int = 55) -> str | None:
     text_norm = _snake(text)
     if not text_norm:
         return None
@@ -144,14 +152,18 @@ def best_predicate_from_text(text: str, kb: KnowledgeBase) -> str | None:
         if score > best_score:
             best = p
             best_score = score
-    return best if best_score >= 55 else None
+    return best if best_score >= threshold else None
 
 
 def best_constant_from_text(text: str, kb: KnowledgeBase) -> str | None:
     best = None
     best_score = 0.0
+    text_l = text.lower()
     for c in _real_constants(kb):
-        score = fuzz.partial_ratio(c.lower(), text.lower())
+        score = fuzz.partial_ratio(c.lower(), text_l)
+        # Professor John / Dr. John should map to John if John is the KB constant.
+        if c.lower() in text_l:
+            score = max(score, 100)
         if score > best_score:
             best = c
             best_score = score
@@ -168,24 +180,40 @@ def _remove_negation_words(text: str) -> str:
     t = re.sub(r"\bdoes\s+not\b|\bdo\s+not\b|\bdid\s+not\b", "", t, flags=re.I)
     t = re.sub(r"\bis\s+not\b|\bare\s+not\b|\bhas\s+not\b|\bhave\s+not\b", "", t, flags=re.I)
     t = re.sub(r"\bcannot\b|\bcan't\b|\bnot\b|\bno\b|\bnever\b", "", t, flags=re.I)
+    # For "needs X" we usually want predicate X(Entity), not not X(Entity).
+    t = re.sub(r"\bneeds?\b|\bmust\b|\bto qualify\b|\bto get\b", "", t, flags=re.I)
     return " ".join(t.split())
 
 
 def _clean_phrase(text: str) -> str:
     t = text.strip()
-    t = re.sub(r"^(all|a|an|the|any|someone|students?|faculty members?|drivers?|python projects?|python code)\b", "", t, flags=re.I)
+    t = re.sub(
+        r"^(all|a|an|the|any|someone|anyone|students?|faculty members?|drivers?|python projects?|python code)\b",
+        "",
+        t,
+        flags=re.I,
+    )
     t = re.sub(r"\b(according to the premises|according to the above premises)\b", "", t, flags=re.I)
-    t = re.sub(r"\b(must|can|could|should|would|will|does|do|is|are|has|have|then|that|it|they|he|she)\b", "", t, flags=re.I)
+    t = re.sub(
+        r"\b(must|can|could|should|would|will|does|do|is|are|has|have|then|that|it|they|he|she)\b",
+        "",
+        t,
+        flags=re.I,
+    )
     return " ".join(t.split())
 
 
 def _phrase_to_atom_formula(text: str, kb: KnowledgeBase, arg: str = "x") -> str | None:
     neg = _is_negated(text)
-    cleaned = _clean_phrase(_remove_negation_words(text) if neg else text)
+    # "needs X" means we query X, not negation.
+    needs_mode = bool(re.search(r"\bneeds?\b", text, flags=re.I))
+    cleaned = _clean_phrase(_remove_negation_words(text) if (neg or needs_mode) else text)
     pred = best_predicate_from_text(cleaned, kb) or best_predicate_from_text(text, kb)
     if not pred:
         return None
-    return f"not {pred}({arg})" if neg else f"{pred}({arg})"
+    if neg and not needs_mode:
+        return f"not {pred}({arg})"
+    return f"{pred}({arg})"
 
 
 def _phrase_to_atom(text: str, kb: KnowledgeBase) -> str | None:
@@ -195,13 +223,14 @@ def _phrase_to_atom(text: str, kb: KnowledgeBase) -> str | None:
 
 def _split_if_then(text: str) -> tuple[str, str] | None:
     t = " ".join(text.strip().split())
-    # Capture common EXACT wording:
-    # If A, then B
-    # If all A are B, then all A are C
     m = re.search(r"\bif\b\s+(.+?)\s*,?\s*\bthen\b\s+(.+)$", t, flags=re.I)
     if m:
         return m.group(1).strip(), m.group(2).strip().rstrip(".?")
     return None
+
+
+def _is_explicit_conditional(text: str) -> bool:
+    return _split_if_then(text) is not None
 
 
 def _parse_conditional_as_forall(text: str, kb: KnowledgeBase) -> str | None:
@@ -217,14 +246,7 @@ def _parse_conditional_as_forall(text: str, kb: KnowledgeBase) -> str | None:
 
 
 def _extract_embedded_conditional(question: str) -> str | None:
-    """Extract conditional content from yes/no questions.
-
-    Example:
-    Does it follow that if all Python projects are well-structured, then all Python projects are optimized?
-    -> if all Python projects are well-structured, then all Python projects are optimized
-    """
     q = question.strip()
-    # Prefer content after "that" when present.
     m = re.search(r"\bthat\b\s+(.+?)\??$", q, flags=re.I | re.S)
     if m and " if " in f" {m.group(1).lower()} ":
         return m.group(1).strip().rstrip("?")
@@ -234,12 +256,6 @@ def _extract_embedded_conditional(question: str) -> str | None:
 
 
 def parse_question_rule_based(question: str, kb: KnowledgeBase) -> ParsedQuestion:
-    """Safe fallback parser.
-
-    It intentionally avoids letting yes/no questions become MCQ. It also handles
-    simple conditional queries so that the pipeline can recover when the LLM
-    returns invalid JSON or the wrong kind.
-    """
     choices = extract_choices(question)
     if choices:
         parsed_choices: dict[str, str] = {}
@@ -292,10 +308,11 @@ Hard constraints:
 - Never invent A/B choices for a Yes/No question.
 - If the original question has A-D choices, output kind="multiple_choice" and include exactly A, B, C, D.
 - Parse each MCQ option independently.
+- Use ForAll implication ONLY when the option itself is an explicit "If ..., then ..." statement.
+- For factual statements about named entities, output an atom like predicate(Entity), never ForAll(...).
 - If an option says "If ..., then ...", the output for that option MUST contain "->".
 - Use only available predicates when possible.
-- Prefer canonical syntax: ForAll(x, A(x) -> B(x)), not symbols like ∀ or ¬.
-- Use "not pred(x)" for negation.
+- Prefer canonical syntax: ForAll(x, A(x) -> B(x)); use "not pred(x)" for negation.
 - Do not map all options to the same target unless the option texts are truly equivalent.
 
 Schema for Yes/No:
@@ -307,7 +324,6 @@ Schema for multiple choice:
 
 
 def _extract_json_object(text: str) -> dict[str, Any] | None:
-    # Remove markdown fences if the model used them.
     text = re.sub(r"```(?:json)?", "", text).replace("```", "")
     m = re.search(r"\{.*\}", text, flags=re.S)
     if not m:
@@ -327,8 +343,6 @@ def _normalize_parsed_obj(obj: dict[str, Any]) -> dict[str, Any] | None:
         choices = obj.get("choices") or {}
         if not isinstance(choices, dict):
             return None
-        # EXACT MCQ should be A-D. Reject 1-2 fake options; this fixes cases
-        # where the LLM turns a yes/no question into a fake MCQ.
         labels = set(choices.keys())
         if not {"A", "B", "C", "D"}.issubset(labels):
             return None
@@ -360,11 +374,86 @@ def parse_llm_json(text: str) -> ParsedQuestion | None:
         return None
 
 
+def postprocess_parsed_question(question: str, kb: KnowledgeBase, parsed: ParsedQuestion) -> ParsedQuestion:
+    """Enforce shape constraints after LLM parsing.
+
+    This is intentionally deterministic. It fixes the common failure where the
+    model converts factual options like "Sophia qualifies..." into universal
+    implications, which makes material-implication reasoning too permissive.
+    """
+    post_warnings: list[str] = []
+    choices_text = extract_choices(question)
+
+    # Yes/No guard: no A/B/C/D in the source question means the output must be yes_no.
+    if not choices_text:
+        if parsed.kind != "yes_no":
+            post_warnings.append("forced_yes_no_over_llm_kind")
+            rb = parse_question_rule_based(question, kb)
+            rb.raw = {**parsed.raw, "postprocess_warnings": post_warnings}
+            rb.parser = f"{parsed.parser}+guard"
+            return rb
+        embedded = _extract_embedded_conditional(question)
+        if embedded:
+            conditional = _parse_conditional_as_forall(embedded, kb)
+            if conditional and parsed.target != conditional:
+                parsed.target = conditional
+                post_warnings.append("normalized_yes_no_conditional_target")
+        parsed.raw = {**parsed.raw, "postprocess_warnings": post_warnings}
+        return parsed
+
+    # MCQ guard: source has choices, so output must be multiple_choice A-D.
+    if parsed.kind != "multiple_choice" or not parsed.choices:
+        rb = parse_question_rule_based(question, kb)
+        rb.raw = {**parsed.raw, "postprocess_warnings": ["forced_mcq_over_llm_kind"]}
+        rb.parser = f"{parsed.parser}+guard"
+        return rb
+
+    fixed: dict[str, str] = {}
+    for label, option_text in choices_text.items():
+        model_value = normalize_logic_value(parsed.choices.get(label, ""))
+        option_is_conditional = _is_explicit_conditional(option_text)
+        option_const = best_constant_from_text(option_text, kb)
+
+        if option_is_conditional:
+            # Explicit conditionals should be ForAll implications. If the model failed,
+            # reconstruct from the option text.
+            if "->" in model_value and (model_value.lower().startswith("forall") or "(" in model_value):
+                fixed[label] = model_value
+            else:
+                fallback = _parse_conditional_as_forall(option_text, kb)
+                fixed[label] = fallback if fallback else model_value
+                post_warnings.append(f"option_{label}_conditional_reparsed")
+            continue
+
+        # Factual entity options should be atoms. ForAll here is usually a hallucinated rule.
+        if option_const or model_value.lower().startswith("forall") or "->" in model_value:
+            atom = _phrase_to_atom(option_text, kb)
+            if atom:
+                fixed[label] = atom
+                if model_value and model_value != atom:
+                    post_warnings.append(f"option_{label}_entity_atom_postprocessed")
+                continue
+
+        # Last fallback: keep model value if it is atom-like; otherwise use rule-based atom.
+        if model_value and "->" not in model_value:
+            fixed[label] = model_value
+        else:
+            atom = _phrase_to_atom(option_text, kb)
+            fixed[label] = atom if atom else (model_value or _snake(option_text))
+            post_warnings.append(f"option_{label}_fallback_atom")
+
+    parsed.choices = fixed
+    parsed.target = None
+    parsed.raw = {**parsed.raw, "postprocess_warnings": post_warnings}
+    if post_warnings:
+        parsed.parser = f"{parsed.parser}+post"
+    return parsed
+
+
 def parsed_target_to_atom(s: str | None) -> Atom | None:
     if not s:
         return None
     q = s.strip()
-    # Rule queries are handled upstream by Z3Backend.prove_query_string.
     if "->" in q or "→" in q or q.lower().startswith("forall") or q.startswith("∀"):
         return None
     try:
