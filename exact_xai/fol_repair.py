@@ -53,6 +53,10 @@ def collapse_repeated_suffixes(s: str) -> str:
 def normalize_predicate_name(pred: str) -> str:
     pred = collapse_repeated_suffixes(pred.strip())
     pred = re.sub(r"^x_", "", pred)
+    # In Python-project records, LLM/query parser sometimes drops the domain suffix.
+    # Keep curriculum predicates untouched (well_structured_curriculum is different).
+    if pred == "well_structured":
+        pred = "well_structured_project"
     pred = pred.replace("has_extended_library_access", "extended_library_access")
     pred = pred.replace("eligible_for_extended_library_access", "extended_library_access")
     pred = pred.replace("can_apply_for_collaborative_research_projects", "can_apply_collaborative_projects")

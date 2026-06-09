@@ -128,3 +128,25 @@ def test_david_needs_to_pass_course_b_first_is_negative():
     assert parsed.choices["B"] == "eligible_for_internship(David)"
     assert parsed.choices["C"] == "not passed_b(David)"
     assert parsed.choices["D"] == "not eligible_for_internship(David)"
+
+
+def test_v43_well_structured_project_alias_keeps_python_conditional_target():
+    kb = parse_fol_premises([
+        "ForAll(x, well_structured_project(x) -> optimized_project(x))",
+        "Exists(x, optimized_project(x))",
+    ])
+    q = "Does it follow that if all Python projects are well-structured, then all Python projects are optimized, according to the premises?"
+    parsed = parse_question_rule_based(q, kb)
+    assert parsed.target == "ForAll(x, well_structured_project(x) -> optimized_project(x))"
+
+
+def test_v43_hazmat_but_cannot_option_does_not_duplicate_negative_target():
+    kb = parse_fol_premises([
+        "ForAll(x, can_transport_standard_goods(x) & completed_hazmat_training(x) & received_safety_endorsement(x) -> can_transport_hazardous_materials(x))",
+        "not_received_safety_endorsement(John)",
+    ])
+    q = "Based on the premises, what can we conclude about John’s qualifications?\nA. John can transport hazardous materials but cannot cross state lines\nB. John can cross state lines with hazardous cargo\nC. John cannot transport hazardous materials\nD. John is not qualified to transport any kind of goods"
+    parsed = parse_question_rule_based(q, kb)
+    assert parsed.choices["A"] == "can_transport_hazardous_materials(John) & not can_cross_state_lines_hazardous(John)"
+    assert parsed.choices["C"] == "not can_transport_hazardous_materials(John)"
+    assert parsed.choices["A"] != parsed.choices["C"]

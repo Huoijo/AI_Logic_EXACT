@@ -254,6 +254,18 @@ def _special_entity_option_atom(text: str, kb: KnowledgeBase, default_const: str
 
     t = normalize_text_for_matching(text)
 
+    # Compound contrast options: "can X but cannot Y" must not collapse to just
+    # the negative half. Returning a conjunction keeps it distinct from simpler
+    # options like "John cannot transport hazardous materials"; if the downstream
+    # scorer cannot prove conjunctions yet, this option stays Uncertain/No rather
+    # than duplicating the correct negative target.
+    if re.search(r"\bcan\b.*hazardous_materials.*\bbut\b.*(?:cannot|can't|not).*state_lines", t):
+        return f"can_transport_hazardous_materials({const}) & not can_cross_state_lines_hazardous({const})"
+    if re.search(r"\bcan\b.*restricted_archives.*\bbut\b.*(?:cannot|can't|not).*submit", t):
+        return f"access_restricted_archives({const}) & not can_submit_proposals({const})"
+    if re.search(r"\bcan\b.*use_equipment.*\bbut\b.*(?:cannot|can't|not).*book", t):
+        return f"can_use_equipment({const}) & not can_book_training({const})"
+
     # Positive target statements.
     if re.search(r"\bqualif(?:y|ies|ied)\b.*\bgraduate_fellowship_program\b", t):
         return f"qualifies_for_graduate_fellowship_program({const})"
