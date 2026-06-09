@@ -22,8 +22,36 @@ def _num_token(x: str) -> str:
     return x.strip().replace(".", "_").replace("%", "percent")
 
 
+def collapse_repeated_suffixes(s: str) -> str:
+    """Collapse deterministic repair over-expansion such as _program_program.
+
+    v4.0 normalized "graduate_fellowship" -> "graduate_fellowship_program" in
+    more than one pass, which could produce predicates like
+    qualifies_for_graduate_fellowship_program_program(...).
+    """
+    out = str(s)
+    # Specific high-impact aliases first.
+    out = re.sub(r"(graduate_fellowship_program)(?:_program)+", r"\1", out)
+    out = re.sub(r"(qualifies_for_graduate_fellowship_program)(?:_program)+", r"\1", out)
+
+    # Generic repeated terminal suffix cleanup.
+    for suffix in [
+        "program",
+        "course", "courses",
+        "class", "classes",
+        "project", "projects",
+        "certification",
+        "degree", "degrees",
+        "research",
+        "training",
+        "hours",
+    ]:
+        out = re.sub(rf"(?:_{suffix}){{2,}}", f"_{suffix}", out)
+    return out
+
+
 def normalize_predicate_name(pred: str) -> str:
-    pred = pred.strip()
+    pred = collapse_repeated_suffixes(pred.strip())
     pred = re.sub(r"^x_", "", pred)
     pred = pred.replace("has_extended_library_access", "extended_library_access")
     pred = pred.replace("eligible_for_extended_library_access", "extended_library_access")
@@ -32,9 +60,12 @@ def normalize_predicate_name(pred: str) -> str:
     pred = pred.replace("can_submit_research_proposals", "can_submit_proposals")
     pred = pred.replace("has_published_at_least_one_academic_paper", "published_at_least_one_paper")
     pred = pred.replace("completed_all_courses", "completed_all_required_courses")
+    pred = pred.replace("graduates_with_honors", "graduated_with_honors")
+    pred = pred.replace("graduate_fellowship_program_program", "graduate_fellowship_program")
+    pred = pred.replace("qualifies_for_graduate_fellowship_program_program", "qualifies_for_graduate_fellowship_program")
     pred = pred.replace("qualifies_for_graduate_fellowship", "qualifies_for_graduate_fellowship_program")
     pred = pred.replace("graduate_fellowship", "graduate_fellowship_program")
-    return pred
+    return collapse_repeated_suffixes(pred)
 
 
 def normalize_entity_name(arg: str) -> str:
@@ -132,7 +163,7 @@ def repair_fol_string(s: str) -> str:
     # Normalize predicate aliases after all rewrites.
     s = _normalize_pred_calls(s)
     s = re.sub(r"\s+", " ", s).strip()
-    return s
+    return collapse_repeated_suffixes(s)
 
 
 def strict_fol_warnings(s: str) -> list[str]:

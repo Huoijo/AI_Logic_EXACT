@@ -7,7 +7,7 @@ from typing import Any
 from rapidfuzz import fuzz
 
 from .fol import Atom, KnowledgeBase, parse_atom
-from .fol_repair import repair_fol_string, normalize_predicate_name
+from .fol_repair import repair_fol_string, normalize_predicate_name, collapse_repeated_suffixes
 from .schemas import ParsedQuestion
 
 # Match EXACT-style MCQ options of the form A. ... B. ... C. ... D. ...
@@ -72,6 +72,8 @@ DOMAIN_REWRITES = {
     "safety endorsement": "safety_endorsement",
     "research fellowship program": "graduate_fellowship_program",
     "graduate fellowship program": "graduate_fellowship_program",
+    "graduate fellowship": "graduate_fellowship_program",
+    "fellowship program": "graduate_fellowship_program",
     "academic papers": "publications",
     "personal training sessions": "book_training",
     "training sessions": "book_training",
@@ -95,7 +97,7 @@ def _snake(s: str) -> str:
 
 def normalize_logic_value(s: str) -> str:
     """Normalize model-produced logic strings into parser/Z3-friendly syntax."""
-    return repair_fol_string(str(s).strip())
+    return collapse_repeated_suffixes(repair_fol_string(str(s).strip()))
 
 
 def extract_choices(question: str) -> dict[str, str]:
@@ -226,11 +228,118 @@ def _phrase_to_atom(text: str, kb: KnowledgeBase, default_const: str | None = No
     return _phrase_to_atom_formula(text, kb, const)
 
 
+def _has_predicate(kb: KnowledgeBase, pred: str) -> bool:
+    return normalize_predicate_name(pred) in {normalize_predicate_name(p) for p in predicates(kb)}
+
+
+def _special_entity_option_atom(text: str, kb: KnowledgeBase, default_const: str | None = None) -> str | None:
+    """Handle high-impact MCQ phrasings before fuzzy matching.
+
+    These are deliberately conservative. They prevent factual options like
+    "John qualifies for the graduate fellowship program" from being rewritten
+    into unrelated shallow facts such as completed_thesis(John), and prevent
+    "needs more publications" from becoming the positive publication fact.
+    """
+    const = best_constant_from_text(text, kb) or default_const
+    if not const:
+        return None
+
+    t = normalize_text_for_matching(text)
+
+    # Positive target statements.
+    if re.search(r"\bqualif(?:y|ies|ied)\b.*\bgraduate_fellowship_program\b", t):
+        return f"qualifies_for_graduate_fellowship_program({const})"
+    if "graduate_fellowship_program" in t and not re.search(r"\bneeds?\b|\bmust\b|\binsufficient\b|\bcannot\b|\bcan't\b", t):
+        return f"qualifies_for_graduate_fellowship_program({const})"
+    if "academic_distinction" in t and not re.search(r"\bneeds?\b|\bmust\b|\binsufficient\b|\bcannot\b|\bcan't\b", t):
+        return f"receives_academic_distinction({const})"
+
+    # Missing/requirement distractors.
+    if re.search(r"\bneeds?\b.*faculty_recommendation", t):
+        return f"received_faculty_recommendation({const})"
+    if re.search(r"\bneeds?\b.*internship|\bmust\b.*complete.*internship", t):
+        return f"completed_internship({const})"
+    if re.search(r"\bgpa\b.*insufficient|insufficient.*\bgpa\b", t):
+        # Prefer the explicit threshold predicate if the KB has it.
+        for pred in sorted(predicates(kb)):
+            np = normalize_predicate_name(pred)
+            if "gpa" in np and ("above_3_5" in np or "at_least_3_5" in np):
+                return f"not {np}({const})"
+        return f"not gpa_above_3_5({const})"
+    if re.search(r"\bneeds?\b.*(more|additional|extra).*(publication|paper)", t):
+        for pred in sorted(predicates(kb)):
+            np = normalize_predicate_name(pred)
+            if "publication" in np or "published" in np or "paper" in np:
+                return f"not {np}({const})"
+        return f"not at_least_3_publications({const})"
+
+    return None
+
+
 def _split_if_then(text: str) -> tuple[str, str] | None:
     t = " ".join(text.strip().split())
     m = re.search(r"\bif\b\s+(.+?)\s*,?\s*\bthen\b\s+(.+)$", t, flags=re.I)
     if m:
         return m.group(1).strip(), m.group(2).strip().rstrip(".?")
+    return None
+
+
+def _extract_subject_complement(clause: str) -> tuple[str | None, str]:
+    """Return (subject, predicate phrase) for clauses like 'all projects are optimized'.
+
+    This prevents conditionals such as "if all Python projects are
+    well-structured, then all Python projects are optimized" from degenerating
+    into a tautology like python_project(x) -> python_project(x).
+    """
+    c = re.sub(r"\baccording to the premises\b", "", clause, flags=re.I)
+    c = c.strip().strip(",. ?")
+
+    # all Python projects are well-structured
+    m = re.match(
+        r"^(?:all|every|any|a|an|the)?\s*(.+?)\s+"
+        r"(?:are|is|be|being|become|becomes)\s+(.+)$",
+        c,
+        flags=re.I,
+    )
+    if m:
+        subject = m.group(1).strip()
+        pred_phrase = m.group(2).strip()
+        return subject, pred_phrase
+
+    # Python projects have clean readable code
+    m = re.match(
+        r"^(?:all|every|any|a|an|the)?\s*(.+?)\s+"
+        r"(?:has|have|had|holds?|maintains?|receives?|received|completed|passes?|passed)\s+(.+)$",
+        c,
+        flags=re.I,
+    )
+    if m:
+        subject = m.group(1).strip()
+        pred_phrase = c
+        return subject, pred_phrase
+
+    # pronoun continuation: it is optimized / they are optimized
+    m = re.match(r"^(?:it|they|he|she)\s+(?:is|are|be|being)\s+(.+)$", c, flags=re.I)
+    if m:
+        return None, m.group(1).strip()
+
+    return None, c
+
+
+def _condition_clause_to_atom_formula(clause: str, kb: KnowledgeBase, arg: str = "x", inherited_subject: str | None = None) -> str | None:
+    subject, pred_phrase = _extract_subject_complement(clause)
+    subject = subject or inherited_subject
+    candidates: list[str] = [pred_phrase]
+    if subject:
+        # Try the complement first ("well-structured") before the full clause
+        # ("well-structured Python projects"), otherwise broad type predicates
+        # like python_project can win the fuzzy match.
+        candidates.append(f"{pred_phrase} {subject}")
+    candidates.append(clause)
+    for cand in candidates:
+        atom = _phrase_to_atom_formula(cand, kb, arg)
+        if atom:
+            return atom
     return None
 
 
@@ -243,10 +352,17 @@ def _parse_conditional_as_forall(text: str, kb: KnowledgeBase) -> str | None:
     if not parts:
         return None
     left, right = parts
-    ant = _phrase_to_atom_formula(left, kb, "x")
-    cons = _phrase_to_atom_formula(right, kb, "x")
+
+    left_subject, _ = _extract_subject_complement(left)
+    ant = _condition_clause_to_atom_formula(left, kb, "x", left_subject)
+    cons = _condition_clause_to_atom_formula(right, kb, "x", left_subject)
+
+    # Fallback to the older matcher if the subject/complement parser failed.
+    ant = ant or _phrase_to_atom_formula(left, kb, "x")
+    cons = cons or _phrase_to_atom_formula(right, kb, "x")
+
     if ant and cons:
-        return f"ForAll(x, {ant} -> {cons})"
+        return collapse_repeated_suffixes(f"ForAll(x, {ant} -> {cons})")
     return None
 
 
@@ -266,6 +382,10 @@ def parse_question_rule_based(question: str, kb: KnowledgeBase) -> ParsedQuestio
         parsed_choices: dict[str, str] = {}
         context_const = best_constant_from_text(question, kb)
         for label, text in choices.items():
+            special = _special_entity_option_atom(text, kb, context_const)
+            if special:
+                parsed_choices[label] = special
+                continue
             conditional = _parse_conditional_as_forall(text, kb)
             if conditional:
                 parsed_choices[label] = conditional
@@ -431,11 +551,18 @@ def postprocess_parsed_question(question: str, kb: KnowledgeBase, parsed: Parsed
         option_is_conditional = _is_explicit_conditional(option_text)
         option_const = best_constant_from_text(option_text, kb) or context_const
 
+        special = _special_entity_option_atom(option_text, kb, context_const)
+        if special:
+            fixed[label] = special
+            if model_value and model_value != special:
+                post_warnings.append(f"option_{label}_entity_atom_postprocessed")
+            continue
+
         if option_is_conditional:
             # Explicit conditionals should be ForAll implications. If the model failed,
             # reconstruct from the option text.
             if "->" in model_value and (model_value.lower().startswith("forall") or "(" in model_value):
-                fixed[label] = model_value
+                fixed[label] = collapse_repeated_suffixes(model_value)
             else:
                 fallback = _parse_conditional_as_forall(option_text, kb)
                 fixed[label] = fallback if fallback else model_value
@@ -446,17 +573,17 @@ def postprocess_parsed_question(question: str, kb: KnowledgeBase, parsed: Parsed
         if option_const or model_value.lower().startswith("forall") or "->" in model_value:
             atom = _phrase_to_atom(option_text, kb, context_const)
             if atom:
-                fixed[label] = atom
+                fixed[label] = collapse_repeated_suffixes(atom)
                 if model_value and model_value != atom:
                     post_warnings.append(f"option_{label}_entity_atom_postprocessed")
                 continue
 
         # Last fallback: keep model value if it is atom-like; otherwise use rule-based atom.
         if model_value and "->" not in model_value:
-            fixed[label] = model_value
+            fixed[label] = collapse_repeated_suffixes(model_value)
         else:
             atom = _phrase_to_atom(option_text, kb, context_const)
-            fixed[label] = atom if atom else (model_value or _snake(option_text))
+            fixed[label] = collapse_repeated_suffixes(atom) if atom else collapse_repeated_suffixes(model_value or _snake(option_text))
             post_warnings.append(f"option_{label}_fallback_atom")
 
     parsed.choices = fixed

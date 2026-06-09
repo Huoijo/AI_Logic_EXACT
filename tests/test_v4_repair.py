@@ -35,3 +35,54 @@ def test_numeric_predicate_threshold_entails_lower_threshold():
     ])
     rr = Reasoner(kb).prove_atom(parse_atom("authorized_to_prescribe_medication(John)"))
     assert rr.answer == "Yes"
+
+
+def test_repeated_program_suffix_collapse():
+    from exact_xai.fol_repair import normalize_predicate_name, repair_fol_string
+
+    assert normalize_predicate_name(
+        "qualifies_for_graduate_fellowship_program_program_program"
+    ) == "qualifies_for_graduate_fellowship_program"
+    assert repair_fol_string(
+        "qualifies_for_graduate_fellowship_program_program(John)"
+    ) == "qualifies_for_graduate_fellowship_program(John)"
+
+
+def test_yes_no_if_all_conditional_not_tautology():
+    from exact_xai.query_parser import parse_question_rule_based
+
+    kb = parse_fol_premises([
+        "ForAll(x, well_structured_project(x) -> optimized_project(x))",
+        "ForAll(x, python_project(x) -> well_structured_project(x))",
+    ])
+    q = (
+        "Does it follow that if all Python projects are well-structured, "
+        "then all Python projects are optimized, according to the premises?"
+    )
+    parsed = parse_question_rule_based(q, kb)
+    assert parsed.kind == "yes_no"
+    assert parsed.target == "ForAll(x, well_structured_project(x) -> optimized_project(x))"
+
+
+def test_john_fellowship_option_postprocess():
+    from exact_xai.query_parser import parse_question_rule_based
+
+    kb = parse_fol_premises([
+        "ForAll(x, completed_all_required_courses(x) -> eligible_for_graduation(x))",
+        "ForAll(x, (eligible_for_graduation(x) & gpa_above_3_5(x)) -> graduated_with_honors(x))",
+        "ForAll(x, (graduated_with_honors(x) & completed_thesis(x)) -> receives_academic_distinction(x))",
+        "ForAll(x, receives_academic_distinction(x) -> qualifies_for_graduate_fellowship_program(x))",
+        "completed_all_required_courses(John)",
+        "gpa_above_3_5(John)",
+        "completed_thesis(John)",
+    ])
+    q = """Based on the above premises, which conclusion logically follows?
+A. John qualifies for the graduate fellowship program
+B. John needs faculty recommendation for the fellowship
+C. John must complete an internship to qualify
+D. John’s GPA is insufficient for honors"""
+    parsed = parse_question_rule_based(q, kb)
+    assert parsed.choices["A"] == "qualifies_for_graduate_fellowship_program(John)"
+    assert parsed.choices["B"] == "received_faculty_recommendation(John)"
+    assert parsed.choices["C"] == "completed_internship(John)"
+    assert parsed.choices["D"] == "not gpa_above_3_5(John)"
