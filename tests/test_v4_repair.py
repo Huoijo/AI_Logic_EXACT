@@ -150,3 +150,18 @@ def test_v43_hazmat_but_cannot_option_does_not_duplicate_negative_target():
     assert parsed.choices["A"] == "can_transport_hazardous_materials(John) & not can_cross_state_lines_hazardous(John)"
     assert parsed.choices["C"] == "not can_transport_hazardous_materials(John)"
     assert parsed.choices["A"] != parsed.choices["C"]
+
+
+def test_v431_fewest_premises_prefers_direct_contrapositive_cost():
+    from exact_xai.pipeline import _direct_rule_or_contraposition_cost
+    kb = parse_fol_premises([
+        "ForAll(x, well_tested_code(x) -> optimized_project(x))",
+        "ForAll(x, well_structured_project(x) -> optimized_project(x))",
+        "ForAll(x, not_well_structured(x) -> not_follow_pep8(x))",
+    ])
+    assert _direct_rule_or_contraposition_cost(
+        "ForAll(x, not optimized_project(x) -> not well_tested(x))", kb
+    ) == 1
+    assert _direct_rule_or_contraposition_cost(
+        "ForAll(x, not optimized_project(x) -> not follow_pep8(x))", kb
+    ) is None

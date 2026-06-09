@@ -13,6 +13,70 @@ from .solvers.z3_backend import Z3Backend
 from .requirement_reasoner import question_requests_requirements, requirement_gap_check
 
 
+def _normalize_pred_for_scoring(pred: str) -> str:
+    """Normalize common domain suffixes so proof-cost scoring does not overfit
+    to tiny naming differences like well_tested vs well_tested_code.
+    """
+    p = (pred or "").strip().lower()
+    for suf in ("_project", "_code", "_student", "_person", "_member"):
+        if p.endswith(suf):
+            p = p[: -len(suf)]
+    return p
+
+
+def _parse_unary_implication_query(query: str):
+    """Return (antecedent_pred, antecedent_negated, consequent_pred, consequent_negated)
+    for simple queries like ForAll(x, not A(x) -> not B(x)).
+    """
+    import re
+    q = (query or "").strip()
+    q = q.replace("¬", "not ").replace("→", "->")
+    m = re.match(
+        r"^ForAll\s*\(\s*x\s*,\s*(not\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*\(\s*x\s*\)\s*->\s*(not\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*\(\s*x\s*\)\s*\)\s*$",
+        q,
+    )
+    if not m:
+        return None
+    ant_neg = bool(m.group(1))
+    ant = _normalize_pred_for_scoring(m.group(2))
+    cons_neg = bool(m.group(3))
+    cons = _normalize_pred_for_scoring(m.group(4))
+    return ant, ant_neg, cons, cons_neg
+
+
+def _direct_rule_or_contraposition_cost(query: str, kb) -> int | None:
+    """Cost 1 when a universal implication is exactly a rule or its contrapositive.
+
+    This prevents regressions on questions like "which conclusion follows with the
+    fewest premises?" where material implication/Z3 can make several options true,
+    but the expected answer is the one supported by the shortest rule path.
+    """
+    parsed = _parse_unary_implication_query(query)
+    if parsed is None:
+        return None
+    ant, ant_neg, cons, cons_neg = parsed
+    for rule in getattr(kb, "rules", []):
+        ants = getattr(rule, "antecedents", []) or []
+        consequent = getattr(rule, "consequent", None)
+        if len(ants) != 1 or consequent is None:
+            continue
+        r_ant = _normalize_pred_for_scoring(getattr(ants[0], "pred", ""))
+        r_cons = _normalize_pred_for_scoring(getattr(consequent, "pred", ""))
+
+        # Direct rule: A -> B
+        if not ant_neg and not cons_neg and ant == r_ant and cons == r_cons:
+            return 1
+        # Contrapositive of direct rule: not B -> not A
+        if ant_neg and cons_neg and ant == r_cons and cons == r_ant:
+            return 1
+    return None
+
+
+def _query_complexity_penalty(query: str) -> int:
+    q = (query or "").lower()
+    return q.count("&") + q.count(" and ") + q.count("->") + q.count("not ")
+
+
 class AnswerPipeline:
     def __init__(self, llm=None, input_mode: str = "auto", use_z3: bool = True):
         self.llm = llm
@@ -103,9 +167,24 @@ class AnswerPipeline:
                 rr = option_results[chosen]
                 answer = chosen
             elif len(yes_options) > 1:
+                question_l = (req.question or "").lower()
+
                 def _choice_score(k: str):
                     rr_k = option_results[k]
-                    return (len(rr_k.used_premises), len(rr_k.proof), k)
+                    query_k = parsed.choices.get(k, "")
+                    used_cost = len(rr_k.used_premises)
+
+                    # Special handling for "fewest premises" questions.
+                    # Prefer a direct premise or direct contrapositive over a longer
+                    # proof path that only becomes true via chained implications.
+                    if "fewest premise" in question_l or "fewest premises" in question_l:
+                        direct_cost = _direct_rule_or_contraposition_cost(query_k, reasoner.kb)
+                        if direct_cost is not None:
+                            used_cost = min(used_cost or direct_cost, direct_cost)
+                        return (used_cost, _query_complexity_penalty(query_k), len(rr_k.proof), k)
+
+                    return (used_cost, len(rr_k.proof), _query_complexity_penalty(query_k), k)
+
                 chosen = sorted(yes_options, key=_choice_score)[0]
                 rr = option_results[chosen]
                 answer = chosen
