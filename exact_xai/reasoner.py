@@ -164,6 +164,17 @@ class Reasoner:
             proof = self._trace_proof(neg_target, proofs)
             used = sorted({p for st in proof for p in st.used_premises})
             return ReasonResult("No", proof, used, facts)
+        # If the query itself is negative, e.g. not can_transport_hazardous_materials(John),
+        # support it by showing the positive target is blocked by an explicitly negated
+        # requirement. This is needed for MCQ options such as "John cannot ...".
+        if target.negated:
+            positive_target = Atom(target.pred, target.args, False)
+            blocked_pos = self._blocked_by_negated_requirement(positive_target, facts, seen=set())
+            if blocked_pos:
+                note = f"Positive target {positive_target} is blocked by negated requirement: {blocked_pos}"
+                proof = [ProofStep(derived=str(target), rule_id=None, used=[blocked_pos], used_premises=[], note=note)]
+                return ReasonResult("Yes", proof, [], facts, ["blocked_positive_target_by_negated_requirement"])
+
         blocked = self._blocked_by_negated_requirement(target, facts, seen=set())
         if blocked:
             note = f"Blocked by negated requirement while trying to prove {target}: {blocked}"

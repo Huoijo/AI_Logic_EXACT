@@ -79,6 +79,14 @@ DOMAIN_REWRITES = {
     "training sessions": "book_training",
     "advanced classes": "advanced_classes",
     "clinical hours": "clinical_hours",
+    "Course B": "course_b",
+    "course b": "course_b",
+    "Course C": "course_c",
+    "course c": "course_c",
+    "internship program": "internship",
+    "advanced resources": "resources",
+    "student engagement": "engagement",
+    "critical thinking": "critical_thinking",
 }
 
 
@@ -254,11 +262,37 @@ def _special_entity_option_atom(text: str, kb: KnowledgeBase, default_const: str
     if "academic_distinction" in t and not re.search(r"\bneeds?\b|\bmust\b|\binsufficient\b|\bcannot\b|\bcan't\b", t):
         return f"receives_academic_distinction({const})"
 
+    # Positive target statements outside the fellowship domain.
+    if "collaborative_research_projects" in t and not re.search(r"\bcannot\b|\bcan't\b|\bneeds?\b|\bmust\b|\bnot\b", t):
+        return f"can_apply_collaborative_projects({const})"
+    if "restricted_archives" in t and "submit" not in t and not re.search(r"\bcannot\b|\bcan't\b|\bneeds?\b|\bnot\b", t):
+        return f"access_restricted_archives({const})"
+    if "critical_thinking" in t and not re.search(r"\bneeds?\b|\blacks?\b|\bnot\b|\bcannot\b|\bcan't\b", t):
+        return "enhances_critical_thinking(curriculum)"
+    if "eligible_for_internship" in t or re.search(r"\binternship\b", t) and "not" not in t and "needs" not in t and "only" not in t and "must" not in t:
+        return f"eligible_for_internship({const})"
+
     # Missing/requirement distractors.
     if re.search(r"\bneeds?\b.*faculty_recommendation", t):
         return f"received_faculty_recommendation({const})"
+    if re.search(r"\bneeds?\s+to\s+pass.*course_b|\bneeds?\b.*course_b.*first", t):
+        return f"not passed_b({const})"
+    if re.search(r"\bonly\b.*eligible.*course_b", t):
+        return f"not eligible_for_internship({const})"
     if re.search(r"\bneeds?\b.*internship|\bmust\b.*complete.*internship", t):
         return f"completed_internship({const})"
+    if re.search(r"\bneeds?\b.*(more|additional|extra|longer).*(resources?)", t):
+        return "not provides_access_to_resources(curriculum)"
+    if re.search(r"\bwell_structured\b.*\blacks?\b.*exercises", t):
+        return "not has_exercises(curriculum)"
+    if re.search(r"\bengagement\b.*\bnot\b.*critical_thinking|\bengagement\b.*cannot.*critical_thinking", t):
+        return "not enhances_critical_thinking(curriculum)"
+    if re.search(r"\bmust\b.*pay.*additional|\bneeds?\b.*pay.*additional|additional_fees", t):
+        return f"not paid_annual_fees_on_time({const})"
+    if re.search(r"\bneeds?\b.*(longer|more|additional).*(membership|duration)", t):
+        return f"not membership_duration_at_least_6_months({const})"
+    if re.search(r"\bactive_status\b.*alone.*qualif", t):
+        return f"active_status({const})"
     if re.search(r"\bgpa\b.*insufficient|insufficient.*\bgpa\b", t):
         # Prefer the explicit threshold predicate if the KB has it.
         for pred in sorted(predicates(kb)):

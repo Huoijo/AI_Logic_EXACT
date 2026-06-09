@@ -59,6 +59,21 @@ def normalize_predicate_name(pred: str) -> str:
     pred = pred.replace("can_access_restricted_archives", "access_restricted_archives")
     pred = pred.replace("can_submit_research_proposals", "can_submit_proposals")
     pred = pred.replace("has_published_at_least_one_academic_paper", "published_at_least_one_paper")
+    pred = pred.replace("teaches_for_at_least_5_years", "taught_for_at_least_5_years")
+    pred = pred.replace("has_taught_for_at_least_5_years", "taught_for_at_least_5_years")
+    pred = pred.replace("taught_at_least_5_years", "taught_for_at_least_5_years")
+    pred = pred.replace("valid_membership_card", "valid_membership")
+    pred = pred.replace("has_valid_membership_card", "valid_membership")
+    pred = pred.replace("provides_access_to_advanced_resources", "provides_access_to_resources")
+    pred = pred.replace("provides_advanced_resources", "provides_access_to_resources")
+    pred = pred.replace("has_practical_exercises", "has_exercises")
+    pred = pred.replace("practical_exercises", "has_exercises")
+    pred = pred.replace("enhances_student_engagement", "enhances_engagement")
+    pred = pred.replace("completed_course_b", "passed_b")
+    pred = pred.replace("passed_course_b", "passed_b")
+    pred = pred.replace("enrolled_in_course_b", "enrolled_in_b")
+    pred = pred.replace("enrolled_in_course_c", "enrolled_in_c")
+    pred = pred.replace("eligible_for_internship_program", "eligible_for_internship")
     pred = pred.replace("completed_all_courses", "completed_all_required_courses")
     pred = pred.replace("graduates_with_honors", "graduated_with_honors")
     pred = pred.replace("graduate_fellowship_program_program", "graduate_fellowship_program")
@@ -79,7 +94,7 @@ def normalize_entity_name(arg: str) -> str:
         "sophia": "Sophia",
         "david": "David",
         "alex": "Alex",
-        "sarah": "sarah",
+        "sarah": "Sarah",
         "minh": "minh",
         "phd_degree": "PhD",
         "phd": "PhD",

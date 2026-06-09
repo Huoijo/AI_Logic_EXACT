@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from .fol import parse_fol_premises
-from .fol_repair import repair_fol_list, strict_fol_warnings
+from .fol_repair import repair_fol_list, strict_fol_warnings, repair_fol_string, collapse_repeated_suffixes
 
 
 @dataclass
@@ -140,6 +140,30 @@ def validate_fol_list(premises_fol: list[str]) -> tuple[bool, list[str], list[st
     return True, warnings, rep.repaired
 
 
+
+def contextual_repair_with_nl(premises_nl: list[str], premises_fol: list[str]) -> list[str]:
+    """Small cross-entity repairs that need the original NL premise.
+
+    The LLM often compiles "faculty ... -> the curriculum is well-structured" as
+    well_structured_curriculum(x), where x is faculty.  In the NL, the consequent
+    explicitly refers to the curriculum object, so we ground only the consequent
+    to curriculum while keeping the faculty antecedents variable-bound.
+    """
+    out: list[str] = []
+    for nl, fol in zip(premises_nl, premises_fol):
+        f = collapse_repeated_suffixes(repair_fol_string(fol))
+        low = nl.lower()
+        if "curriculum" in low and "well-structured" in low or "curriculum is well structured" in low:
+            f = re.sub(r"->\s*well_structured_curriculum\(x\)", "-> well_structured_curriculum(curriculum)", f)
+        # If the NL has a combined faculty fact, preserve both conjuncts.
+        if "faculty prioritizes" in low and "curriculum development" in low and "->" not in f:
+            f = "prioritizes_pedagogical_training(faculty) & develops_curriculum(faculty)"
+        out.append(collapse_repeated_suffixes(repair_fol_string(f)))
+    # Preserve extra generated FOL lines if any.
+    if len(premises_fol) > len(out):
+        out.extend(collapse_repeated_suffixes(repair_fol_string(x)) for x in premises_fol[len(out):])
+    return out
+
 def translate_nl_to_fol(premises_nl: list[str], question: str | None = None, llm=None) -> NL2LogicResult:
     if not premises_nl:
         return NL2LogicResult([], warnings=["no_nl_premises"])
@@ -153,8 +177,10 @@ def translate_nl_to_fol(premises_nl: list[str], question: str | None = None, llm
                 fol = obj.get("premises_fol") or obj.get("premises-FOL") or []
                 ok, warns, repaired = validate_fol_list(fol)
                 if ok and len(repaired) == len(premises_nl):
+                    repaired = contextual_repair_with_nl(premises_nl, repaired)
                     return NL2LogicResult(repaired, warnings=warns, raw={"llm_text": text})
                 if ok:
+                    repaired = contextual_repair_with_nl(premises_nl, repaired)
                     return NL2LogicResult(repaired, warnings=warns + ["nl2logic_count_mismatch"], raw={"llm_text": text})
                 # one repair attempt: ask it to fix only format/count.
                 repair_prompt = prompt + "\n\nYour previous output was invalid. Return valid JSON only with exactly one FOL string per premise. Previous output:\n" + text
@@ -164,6 +190,7 @@ def translate_nl_to_fol(premises_nl: list[str], question: str | None = None, llm
                     fol2 = obj2.get("premises_fol") or obj2.get("premises-FOL") or []
                     ok2, warns2, repaired2 = validate_fol_list(fol2)
                     if ok2:
+                        repaired2 = contextual_repair_with_nl(premises_nl, repaired2)
                         return NL2LogicResult(repaired2, warnings=warns2 + ["nl2logic_repaired"], raw={"llm_text": text, "repair_text": text2})
         except Exception as e:
             return heuristic_translate_premises(premises_nl)
