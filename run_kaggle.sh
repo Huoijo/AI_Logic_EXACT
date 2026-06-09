@@ -17,7 +17,7 @@ BUILD_DIR=".kaggle_build"
 OUT_DIR="kaggle_outputs"
 ART_DIR="artifacts"
 ARTIFACT_ZIP="exact_artifacts.zip"
-MAX_ATTEMPTS="${MAX_ATTEMPTS:-90}"
+MAX_ATTEMPTS="${MAX_ATTEMPTS:-900}"
 SLEEP_SECONDS="${SLEEP_SECONDS:-20}"
 START_TS="$(date +%s)"
 

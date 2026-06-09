@@ -33,7 +33,7 @@ BUILD_DIR=".kaggle_train_build"
 OUT_DIR="kaggle_train_outputs"
 ART_DIR="train_artifacts"
 ARTIFACT_ZIP="exact_train_artifacts.zip"
-MAX_ATTEMPTS="${MAX_ATTEMPTS:-180}"
+MAX_ATTEMPTS="${MAX_ATTEMPTS:-1800}"
 SLEEP_SECONDS="${SLEEP_SECONDS:-30}"
 START_TS="$(date +%s)"
 
