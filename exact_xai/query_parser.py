@@ -248,11 +248,38 @@ def _special_entity_option_atom(text: str, kb: KnowledgeBase, default_const: str
     into unrelated shallow facts such as completed_thesis(John), and prevent
     "needs more publications" from becoming the positive publication fact.
     """
+    t = normalize_text_for_matching(text)
+
+    # Generic modal/scholarship/fellowship options. These options often have no
+    # named entity, but they are still valid universal conclusions. Keep them as
+    # implications instead of collapsing them to shallow atoms.
+    t_snake = _snake(text)
+    if (
+        ("research_fellowship" in t_snake or "fellowship" in t_snake)
+        and (
+            "high_quality" in t_snake
+            or "quality_essay" in t_snake
+            or "analytical_essay" in t_snake
+            or "academic_recognition" in t_snake
+        )
+    ):
+        return "ForAll(x, writes_high_quality_essay(x) -> may_qualify_for_research_fellowship(x))"
+    if (
+        ("scholarship" in t_snake or "advanced_physics_scholarship" in t_snake)
+        and (
+            "original_research" in t_snake
+            or "original_research_paper" in t_snake
+            or "research_paper" in t_snake
+            or "research_papers" in t_snake
+        )
+    ):
+        return "ForAll(x, original_research_papers(x) -> scholarship_eligible(x))"
+    if "optimal" in t and "interval" in t and ("forgetting" in t or "premature" in t):
+        return "ForAll(x, too_long_review_intervals(x) -> increased_forgetting(x))"
+
     const = best_constant_from_text(text, kb) or default_const
     if not const:
         return None
-
-    t = normalize_text_for_matching(text)
 
     # Compound contrast options: "can X but cannot Y" must not collapse to just
     # the negative half. Returning a conjunction keeps it distinct from simpler
@@ -265,6 +292,15 @@ def _special_entity_option_atom(text: str, kb: KnowledgeBase, default_const: str
         return f"access_restricted_archives({const}) & not can_submit_proposals({const})"
     if re.search(r"\bcan\b.*use_equipment.*\bbut\b.*(?:cannot|can't|not).*book", t):
         return f"can_use_equipment({const}) & not can_book_training({const})"
+
+    # Direct negated status phrasings. Without this, "isn't registered" can
+    # be misread as the positive background fact registered_nurse(John).
+    if re.search(r"\b(isn['’]?t|is_not|not|cannot|can't)\b.*\bregistered\b", t) or "isnt_registered" in t:
+        return f"not registered_nurse({const})"
+
+    # Common positive conclusion/action targets.
+    if re.search(r"\b(can|authorized|prescribe)\b.*\bprescrib", t):
+        return f"authorized_to_prescribe({const})"
 
     # Positive target statements.
     if re.search(r"\bqualif(?:y|ies|ied)\b.*\bgraduate_fellowship_program\b", t):

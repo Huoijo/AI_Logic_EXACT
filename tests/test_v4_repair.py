@@ -165,3 +165,49 @@ def test_v431_fewest_premises_prefers_direct_contrapositive_cost():
     assert _direct_rule_or_contraposition_cost(
         "ForAll(x, not optimized_project(x) -> not follow_pep8(x))", kb
     ) is None
+
+
+def test_v44_negated_registered_option():
+    from exact_xai.query_parser import _special_entity_option_atom
+
+    class KB:
+        facts = []
+        rules = []
+        def constants(self):
+            return {"John"}
+
+    assert _special_entity_option_atom("He isn't registered", KB(), "John") == "not registered_nurse(John)"
+
+
+def test_v44_modal_option_keeps_universal_implication():
+    from exact_xai.query_parser import _special_entity_option_atom
+
+    class KB:
+        facts = []
+        rules = []
+        def constants(self):
+            return {"GENERIC"}
+
+    out = _special_entity_option_atom(
+        "A student who writes a high-quality essay can qualify for a research fellowship",
+        KB(),
+        None,
+    )
+    assert out == "ForAll(x, writes_high_quality_essay(x) -> may_qualify_for_research_fellowship(x))"
+
+
+def test_v44_scholarship_option_keeps_universal_implication():
+    from exact_xai.query_parser import _special_entity_option_atom
+
+    class KB:
+        facts = []
+        rules = []
+        def constants(self):
+            return {"GENERIC"}
+
+    out = _special_entity_option_atom(
+        "A student mastering superposition who writes an original research paper qualifies for a scholarship",
+        KB(),
+        None,
+    )
+    assert out == "ForAll(x, original_research_papers(x) -> scholarship_eligible(x))"
