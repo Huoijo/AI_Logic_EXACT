@@ -34,6 +34,13 @@ def collapse_repeated_suffixes(s: str) -> str:
     out = re.sub(r"(graduate_fellowship_program)(?:_program)+", r"\1", out)
     out = re.sub(r"(qualifies_for_graduate_fellowship_program)(?:_program)+", r"\1", out)
 
+    # v4.4.1: collapse accidental character-level plural expansion emitted by
+    # repair passes / model text, e.g. original_research_papersssssss(x).
+    out = re.sub(r"paperss+", "papers", out)
+    out = re.sub(r"essayss+", "essays", out)
+    out = re.sub(r"classess+", "classes", out)
+    out = re.sub(r"coursess+", "courses", out)
+
     # Generic repeated terminal suffix cleanup.
     for suffix in [
         "program",

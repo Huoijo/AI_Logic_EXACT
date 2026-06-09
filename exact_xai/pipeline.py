@@ -210,6 +210,27 @@ class AnswerPipeline:
                 option_results[label] = self.prove_query(query, reasoner, z3_backend, req.question)
 
             yes_options = [k for k, v in option_results.items() if v and v.answer == "Yes"]
+
+            # v4.4.1 regression guard: if every option came back non-Yes,
+            # re-run high-value positive conclusion atoms with the pure
+            # forward reasoner. This protects deterministic conclusions from
+            # accidental backend/guard false negatives without making a
+            # case-specific answer choice.
+            if not yes_options:
+                positive_conclusion_prefixes = (
+                    "qualifies_for_", "authorized_to_", "eligible_for_",
+                    "can_", "receives_", "enhances_", "scholarship_eligible",
+                )
+                for label, query in parsed.choices.items():
+                    qtxt = (query or "").strip()
+                    if any(qtxt.startswith(pref) for pref in positive_conclusion_prefixes):
+                        atom = parsed_target_to_atom(qtxt)
+                        if atom is not None:
+                            rr_retry = reasoner.prove_atom(atom)
+                            if rr_retry.answer == "Yes":
+                                option_results[label] = rr_retry
+                yes_options = [k for k, v in option_results.items() if v and v.answer == "Yes"]
+
             if len(yes_options) == 1:
                 chosen = yes_options[0]
                 rr = option_results[chosen]

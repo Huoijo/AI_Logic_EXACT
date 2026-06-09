@@ -211,3 +211,26 @@ def test_v44_scholarship_option_keeps_universal_implication():
         None,
     )
     assert out == "ForAll(x, original_research_papers(x) -> scholarship_eligible(x))"
+
+
+def test_v441_collapse_papers_character_suffix():
+    from exact_xai.fol_repair import repair_fol_string
+    assert repair_fol_string("original_research_papersssssss(x)") == "original_research_papers(x)"
+
+
+def test_v441_graduate_fellowship_chain_still_proves():
+    from exact_xai.fol import parse_fol_premises
+    from exact_xai.query_parser import parsed_target_to_atom
+    from exact_xai.reasoner import Reasoner
+
+    kb = parse_fol_premises([
+        "ForAll(x, completed_all_required_courses(x) -> eligible_for_graduation(x))",
+        "ForAll(x, (eligible_for_graduation(x) & gpa_above_3_5(x)) -> graduated_with_honors(x))",
+        "ForAll(x, (graduated_with_honors(x) & completed_thesis(x)) -> received_academic_distinction(x))",
+        "ForAll(x, received_academic_distinction(x) -> qualifies_for_graduate_fellowship_program(x))",
+        "completed_all_required_courses(John)",
+        "gpa_above_3_5(John)",
+        "completed_thesis(John)",
+    ])
+    rr = Reasoner(kb).prove_atom(parsed_target_to_atom("qualifies_for_graduate_fellowship_program(John)"))
+    assert rr.answer == "Yes"
