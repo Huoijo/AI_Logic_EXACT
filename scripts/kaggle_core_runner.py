@@ -7,6 +7,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import argparse
 import json
 import os
+import subprocess
 import textwrap
 import time
 from collections import Counter, defaultdict
@@ -350,9 +351,75 @@ def run_translation_benchmark(records: list[AnswerRequest], pipe: AnswerPipeline
     print(report, flush=True)
 
 
+
+def _run_cmd(cmd: list[str], cwd: Path | None = None, env: dict | None = None) -> None:
+    print("RUN:", " ".join(map(str, cmd)), flush=True)
+    subprocess.run(cmd, cwd=cwd, env=env, check=True)
+
+
+def run_v47_build_silver(dataset: Path, out: Path) -> None:
+    silver_dir_env = os.environ.get("SILVER_OUT_DIR", "data/silver_v47")
+    silver_dir = Path(silver_dir_env)
+    if not silver_dir.is_absolute():
+        # Build inside artifact dir so outputs are always downloaded.
+        silver_dir = out / silver_dir_env
+    _run_cmd([
+        sys.executable, str(Path(__file__).resolve().parent / "build_silver_nl2fol_dataset.py"),
+        "--dataset", str(dataset),
+        "--out-dir", str(silver_dir),
+    ])
+    print(f"[v4.7] silver dataset ready: {silver_dir}", flush=True)
+
+
+def run_v47_train_parser(dataset: Path, out: Path) -> None:
+    # Build silver data first unless explicit train/valid files are supplied.
+    silver_dir_env = os.environ.get("SILVER_OUT_DIR", "data/silver_v47")
+    silver_dir = Path(silver_dir_env)
+    if not silver_dir.is_absolute():
+        silver_dir = out / silver_dir_env
+    train_file = os.environ.get("TRAIN_FILE", "")
+    valid_file = os.environ.get("VALID_FILE", "")
+    if not train_file:
+        if not (silver_dir / "all.train.jsonl").exists():
+            run_v47_build_silver(dataset, out)
+        # Default to all.train so question-parse weak samples teach target/choice schema too.
+        train_file = str(silver_dir / "all.train.jsonl")
+        valid_file = str(silver_dir / "all.valid.jsonl")
+    output_adapter = os.environ.get("OUTPUT_ADAPTER", "train_artifacts/adapter_v47")
+    adapter_out = Path(output_adapter)
+    if not adapter_out.is_absolute():
+        adapter_out = out / output_adapter
+    cmd = [
+        sys.executable, str(Path(__file__).resolve().parent / "train_lora_nl2fol_v47.py"),
+        "--train", train_file,
+        "--valid", valid_file,
+        "--model", os.environ.get("MODEL_NAME", "Qwen/Qwen2.5-7B-Instruct"),
+        "--out", str(adapter_out),
+        "--epochs", os.environ.get("TRAIN_EPOCHS", "2"),
+        "--max-steps", os.environ.get("TRAIN_MAX_STEPS", "-1"),
+        "--batch-size", os.environ.get("TRAIN_BATCH_SIZE", "1"),
+        "--grad-accum", os.environ.get("GRAD_ACCUM", "8"),
+        "--lr", os.environ.get("LEARNING_RATE", "2e-4"),
+        "--min-confidence", os.environ.get("MIN_CONFIDENCE", "0.0"),
+        "--use-4bit", os.environ.get("USE_4BIT", "1"),
+    ]
+    _run_cmd(cmd)
+    print(f"[v4.7] adapter ready: {adapter_out}", flush=True)
+
+
+def run_v47_audit(out: Path) -> None:
+    answers = out / "answers.json"
+    if not answers.exists():
+        raise FileNotFoundError(f"answers.json not found for audit: {answers}. Run benchmark first or pass artifacts back.")
+    _run_cmd([
+        sys.executable, str(Path(__file__).resolve().parent / "audit_dirty_cases.py"),
+        "--answers", str(answers),
+        "--out-dir", str(out / "dirty_audit"),
+    ])
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--task", choices=["smoke", "batch", "eval", "benchmark", "translate", "batch_nl"], default="batch")
+    ap.add_argument("--task", choices=["smoke", "batch", "eval", "benchmark", "translate", "batch_nl", "build_silver", "train_parser_v47", "workflow_v47", "audit_dirty"], default="batch")
     ap.add_argument("--dataset", default=None)
     ap.add_argument("--requests", default=None)
     ap.add_argument("--out", default="outputs")
@@ -381,6 +448,21 @@ def main():
         records, loader_warnings = records_from_exact_dataset(data, input_mode=input_mode)
     else:
         raise SystemExit("Provide --dataset or --requests")
+
+    # v4.7 data-driven parser workflow tasks. These do not need AnswerPipeline/LLM benchmark loop.
+    if args.task == "build_silver":
+        run_v47_build_silver(Path(args.dataset), out)
+        return
+    if args.task == "train_parser_v47":
+        run_v47_train_parser(Path(args.dataset), out)
+        return
+    if args.task == "workflow_v47":
+        run_v47_build_silver(Path(args.dataset), out)
+        run_v47_train_parser(Path(args.dataset), out)
+        return
+    if args.task == "audit_dirty":
+        run_v47_audit(out)
+        return
 
     if args.case_ids:
         wanted = {x.strip() for x in str(args.case_ids).split(",") if x.strip()}

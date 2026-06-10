@@ -14,6 +14,17 @@ MODEL_NAME = os.environ.get("MODEL_NAME", "Qwen/Qwen3-8B")
 ADAPTER_PATH = os.environ.get("ADAPTER_PATH", "")
 DATASET = os.environ.get("DATASET", "data/fraction_dataset.json")
 LOG_EACH_CASE = os.environ.get("LOG_EACH_CASE", "1")
+SILVER_OUT_DIR = os.environ.get("SILVER_OUT_DIR", "data/silver_v47")
+TRAIN_FILE = os.environ.get("TRAIN_FILE", "")
+VALID_FILE = os.environ.get("VALID_FILE", "")
+OUTPUT_ADAPTER = os.environ.get("OUTPUT_ADAPTER", "train_artifacts/adapter_v47")
+TRAIN_EPOCHS = os.environ.get("TRAIN_EPOCHS", "2")
+TRAIN_MAX_STEPS = os.environ.get("TRAIN_MAX_STEPS", "-1")
+TRAIN_BATCH_SIZE = os.environ.get("TRAIN_BATCH_SIZE", "1")
+GRAD_ACCUM = os.environ.get("GRAD_ACCUM", "8")
+LEARNING_RATE = os.environ.get("LEARNING_RATE", "2e-4")
+USE_4BIT = os.environ.get("USE_4BIT", "1")
+MIN_CONFIDENCE = os.environ.get("MIN_CONFIDENCE", "0.0")
 
 WORK_DIR = Path("/kaggle/working")
 REPO_DIR = WORK_DIR / "AI_Logic_EXACT"
@@ -43,6 +54,12 @@ def main():
     print(f"LIMIT={LIMIT}", flush=True)
     print(f"CASE_IDS={CASE_IDS}", flush=True)
     print(f"LOG_EACH_CASE={LOG_EACH_CASE}", flush=True)
+    print(f"SILVER_OUT_DIR={SILVER_OUT_DIR}", flush=True)
+    print(f"TRAIN_FILE={TRAIN_FILE or '<auto>'}", flush=True)
+    print(f"VALID_FILE={VALID_FILE or '<auto>'}", flush=True)
+    print(f"OUTPUT_ADAPTER={OUTPUT_ADAPTER}", flush=True)
+    print(f"TRAIN_EPOCHS={TRAIN_EPOCHS}", flush=True)
+    print(f"TRAIN_MAX_STEPS={TRAIN_MAX_STEPS}", flush=True)
     print(f"RUN_ID={RUN_ID}", flush=True)
     print("=" * 70, flush=True)
 
@@ -68,6 +85,17 @@ def main():
     env["RUN_ID"] = RUN_ID
     env["INPUT_MODE"] = INPUT_MODE
     env["LOG_EACH_CASE"] = LOG_EACH_CASE
+    env["SILVER_OUT_DIR"] = SILVER_OUT_DIR
+    env["TRAIN_FILE"] = TRAIN_FILE
+    env["VALID_FILE"] = VALID_FILE
+    env["OUTPUT_ADAPTER"] = OUTPUT_ADAPTER
+    env["TRAIN_EPOCHS"] = TRAIN_EPOCHS
+    env["TRAIN_MAX_STEPS"] = TRAIN_MAX_STEPS
+    env["TRAIN_BATCH_SIZE"] = TRAIN_BATCH_SIZE
+    env["GRAD_ACCUM"] = GRAD_ACCUM
+    env["LEARNING_RATE"] = LEARNING_RATE
+    env["USE_4BIT"] = USE_4BIT
+    env["MIN_CONFIDENCE"] = MIN_CONFIDENCE
     if ADAPTER_PATH:
         # Adapter may be committed in repo or copied into Kaggle model/dataset later.
         maybe_repo_adapter = REPO_DIR / ADAPTER_PATH
