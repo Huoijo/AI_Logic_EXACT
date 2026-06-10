@@ -20,6 +20,7 @@ LIMIT="${LIMIT:-}"
 CASE_IDS="${CASE_IDS:-}"
 RUN_ID="${RUN_ID:-$(date +%Y%m%d_%H%M%S)}"
 MODEL_NAME="${MODEL_NAME:-Qwen/Qwen3-8B}"
+ADAPTER_PATH="${ADAPTER_PATH:-}"
 DATASET="${DATASET:-data/fraction_dataset.json}"
 LOG_EACH_CASE="${LOG_EACH_CASE:-1}"
 REPO_URL="${REPO_URL:-https://github.com/Huoijo/AI_Logic_EXACT.git}"
@@ -96,6 +97,7 @@ echo "EXACT Kaggle Core Runner"
 echo "TASK          = $TASK"
 echo "INPUT_MODE    = $INPUT_MODE"
 echo "MODEL_NAME    = $MODEL_NAME"
+echo "ADAPTER_PATH  = ${ADAPTER_PATH:-<none>}"
 echo "DATASET       = $DATASET"
 echo "BATCH_SIZE    = $BATCH_SIZE"
 echo "LIMIT         = ${LIMIT:-<none>}"
@@ -130,8 +132,10 @@ TASK_FROM_SHELL="$TASK" \
 INPUT_MODE="$INPUT_MODE" \
 BATCH_SIZE="$BATCH_SIZE" \
 LIMIT="$LIMIT" \
+CASE_IDS="$CASE_IDS" \
 RUN_ID="$RUN_ID" \
 MODEL_NAME="$MODEL_NAME" \
+ADAPTER_PATH="$ADAPTER_PATH" \
 DATASET="$DATASET" \
 LOG_EACH_CASE="$LOG_EACH_CASE" \
 REPO_URL="$REPO_URL" \
@@ -151,8 +155,10 @@ replacements = {
     "INPUT_MODE": os.environ.get("INPUT_MODE", "auto"),
     "BATCH_SIZE": os.environ.get("BATCH_SIZE", "0"),
     "LIMIT": os.environ.get("LIMIT", ""),
+    "CASE_IDS": os.environ.get("CASE_IDS", ""),
     "RUN_ID": os.environ.get("RUN_ID", ""),
     "MODEL_NAME": os.environ.get("MODEL_NAME", "Qwen/Qwen3-8B"),
+    "ADAPTER_PATH": os.environ.get("ADAPTER_PATH", ""),
     "DATASET": os.environ.get("DATASET", "data/fraction_dataset.json"),
     "LOG_EACH_CASE": os.environ.get("LOG_EACH_CASE", "1"),
 }
