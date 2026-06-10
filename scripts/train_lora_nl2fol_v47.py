@@ -12,14 +12,24 @@ from typing import Any
 import torch
 from datasets import Dataset
 from peft import LoraConfig, prepare_model_for_kbit_training
-from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig, set_seed
+from transformers import (
+    AutoModelForCausalLM,
+    AutoTokenizer,
+    BitsAndBytesConfig,
+    DataCollatorForLanguageModeling,
+    Trainer,
+    TrainingArguments,
+    set_seed,
+)
+from peft import get_peft_model
 
 try:
     from trl import SFTTrainer, SFTConfig
+    HAS_TRL = True
 except Exception:
-    SFTConfig = None
-    from transformers import TrainingArguments as SFTConfig  # type: ignore
-    from trl import SFTTrainer  # type: ignore
+    SFTTrainer = None  # type: ignore
+    SFTConfig = None  # type: ignore
+    HAS_TRL = False
 
 
 def str2bool(v: Any) -> bool:
@@ -165,7 +175,7 @@ def main() -> None:
     out = Path(args.output_dir)
     out.mkdir(parents=True, exist_ok=True)
 
-    cfg_kwargs = dict(
+    common_args = dict(
         output_dir=str(out),
         num_train_epochs=args.epochs,
         max_steps=args.max_steps if args.max_steps and args.max_steps > 0 else -1,
@@ -183,27 +193,60 @@ def main() -> None:
         remove_unused_columns=False,
         gradient_checkpointing=True,
         optim='paged_adamw_8bit' if quant_config is not None else 'adamw_torch',
-        max_seq_length=args.max_seq_length,
-        packing=False,
-        dataset_text_field='text',
     )
-    # SFTConfig/TrainingArguments names differ between TRL versions.
-    cfg_cls = SFTConfig
-    cfg = cfg_cls(**filter_kwargs(cfg_cls, cfg_kwargs))
 
-    trainer_kwargs = dict(
-        model=model,
-        args=cfg,
-        train_dataset=train_ds,
-        eval_dataset=eval_ds,
-        peft_config=peft_config,
-        tokenizer=tokenizer,
-        processing_class=tokenizer,
-        dataset_text_field='text',
-        max_seq_length=args.max_seq_length,
-        packing=False,
-    )
-    trainer = SFTTrainer(**filter_kwargs(SFTTrainer, trainer_kwargs))
+    if HAS_TRL:
+        print('[trainer] using TRL SFTTrainer', flush=True)
+        trl_args = dict(
+            **common_args,
+            max_seq_length=args.max_seq_length,
+            packing=False,
+            dataset_text_field='text',
+        )
+        cfg = SFTConfig(**filter_kwargs(SFTConfig, trl_args))
+        trainer_kwargs = dict(
+            model=model,
+            args=cfg,
+            train_dataset=train_ds,
+            eval_dataset=eval_ds,
+            peft_config=peft_config,
+            tokenizer=tokenizer,
+            processing_class=tokenizer,
+            dataset_text_field='text',
+            max_seq_length=args.max_seq_length,
+            packing=False,
+        )
+        trainer = SFTTrainer(**filter_kwargs(SFTTrainer, trainer_kwargs))
+    else:
+        print('[trainer] TRL is not installed; using transformers.Trainer fallback', flush=True)
+        # Standard causal-LM fine-tuning fallback: tokenize the same text field
+        # and let DataCollatorForLanguageModeling create labels=input_ids.
+        # This is slightly less ergonomic than TRL SFTTrainer but removes the
+        # hard dependency on `trl`, which is absent in some Kaggle images.
+        if getattr(model.config, 'use_cache', None) is not None:
+            model.config.use_cache = False
+        model = get_peft_model(model, peft_config)
+
+        def tokenize_batch(batch):
+            return tokenizer(
+                batch['text'],
+                truncation=True,
+                max_length=args.max_seq_length,
+                padding=False,
+            )
+
+        tokenized_train = train_ds.map(tokenize_batch, batched=True, remove_columns=['text'])
+        tokenized_eval = eval_ds.map(tokenize_batch, batched=True, remove_columns=['text']) if eval_ds is not None else None
+        hf_args = TrainingArguments(**filter_kwargs(TrainingArguments, common_args))
+        data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
+        trainer = Trainer(
+            model=model,
+            args=hf_args,
+            train_dataset=tokenized_train,
+            eval_dataset=tokenized_eval,
+            data_collator=data_collator,
+        )
+
     trainer.train()
     trainer.model.save_pretrained(out)
     tokenizer.save_pretrained(out)
