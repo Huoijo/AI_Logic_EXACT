@@ -8,6 +8,7 @@ TASK = os.environ.get("TASK", "batch")
 INPUT_MODE = os.environ.get("INPUT_MODE", "auto")
 BATCH_SIZE = os.environ.get("BATCH_SIZE", "0")
 LIMIT = os.environ.get("LIMIT", "")
+CASE_IDS = os.environ.get("CASE_IDS", "")
 RUN_ID = os.environ.get("RUN_ID", "")
 MODEL_NAME = os.environ.get("MODEL_NAME", "Qwen/Qwen3-8B")
 ADAPTER_PATH = os.environ.get("ADAPTER_PATH", "")
@@ -40,6 +41,7 @@ def main():
     print(f"DATASET={DATASET}", flush=True)
     print(f"BATCH_SIZE={BATCH_SIZE}", flush=True)
     print(f"LIMIT={LIMIT}", flush=True)
+    print(f"CASE_IDS={CASE_IDS}", flush=True)
     print(f"LOG_EACH_CASE={LOG_EACH_CASE}", flush=True)
     print(f"RUN_ID={RUN_ID}", flush=True)
     print("=" * 70, flush=True)
@@ -82,6 +84,8 @@ def main():
         cmd += ["--batch-size", str(BATCH_SIZE)]
     if LIMIT:
         cmd += ["--limit", str(LIMIT)]
+    if CASE_IDS:
+        cmd += ["--case-ids", str(CASE_IDS)]
     if str(LOG_EACH_CASE) == "1":
         cmd += ["--log-cases"]
 

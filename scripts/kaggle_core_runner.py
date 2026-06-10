@@ -357,6 +357,7 @@ def main():
     ap.add_argument("--requests", default=None)
     ap.add_argument("--out", default="outputs")
     ap.add_argument("--limit", type=int, default=None)
+    ap.add_argument("--case-ids", default=None, help="Comma-separated AnswerRequest ids to run, e.g. 20:1,23:0")
     ap.add_argument("--start", type=int, default=0)
     ap.add_argument("--batch-size", type=int, default=0)
     ap.add_argument("--input-mode", choices=["auto", "fol", "nl"], default="auto")
@@ -381,6 +382,15 @@ def main():
     else:
         raise SystemExit("Provide --dataset or --requests")
 
+    if args.case_ids:
+        wanted = {x.strip() for x in str(args.case_ids).split(",") if x.strip()}
+        before = len(records)
+        records = [r for r in records if str(r.id) in wanted]
+        found = {str(r.id) for r in records}
+        missing = sorted(wanted - found)
+        if missing:
+            loader_warnings.append(f"case_ids_missing:{missing}")
+        print(f"[case-ids] selected {len(records)}/{before}: {sorted(found)}", flush=True)
     if args.start:
         records = records[args.start:]
     if args.limit:
