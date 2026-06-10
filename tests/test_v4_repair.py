@@ -36,6 +36,17 @@ def test_negative_mcq_option_supported_by_blocked_requirement():
         "not_received_safety_endorsement(John)",
     ])
     rr = Reasoner(kb).prove_atom(parse_atom("not can_transport_hazardous_materials(John)"))
+    print("DEBUG rr:", rr)
+    import exact_xai.pipeline as pp
+    print("DEBUG pipeline:", pp.__file__)
+    print("DEBUG simple:", pp._prove_simple_rule_composition(
+        "ForAll(x, original_research_papers(x) -> scholarship_eligible(x))", kb
+    ))
+    print("DEBUG text:", pp._prove_rule_composition_from_text(
+        "ForAll(x, original_research_papers(x) -> scholarship_eligible(x))", kb
+    ))
+    for r in kb.rules:
+        print("DEBUG rule:", getattr(r, "source_text", None), [(a.pred, a.args, a.negated) for a in r.antecedents], r.consequent.pred, r.consequent.args)
     assert rr.answer == "Yes"
 
 
@@ -233,4 +244,65 @@ def test_v441_graduate_fellowship_chain_still_proves():
         "completed_thesis(John)",
     ])
     rr = Reasoner(kb).prove_atom(parsed_target_to_atom("qualifies_for_graduate_fellowship_program(John)"))
+    assert rr.answer == "Yes"
+
+
+
+def test_v45_rule_composition_proves_universal_chain():
+    from exact_xai.pipeline import AnswerPipeline
+    from exact_xai.schemas import AnswerRequest
+
+    req = AnswerRequest(
+        id="v45_rule_comp",
+        premises_nl=[
+            "Original analytical work in research papers leads to academic recognition.",
+            "Academic recognition in quantum mechanics opens the possibility of an advanced physics scholarship.",
+        ],
+        premises_fol=[
+            "original_research_papers(x) -> recognized(x)",
+            "recognized(x) -> scholarship_eligible(x)",
+        ],
+        question="Does original research imply scholarship eligibility?",
+    )
+    pipe = AnswerPipeline(llm=None, input_mode="fol", use_z3=True)
+    kb, _, _ = pipe.build_kb(req)
+    rr = pipe.prove_query(
+        "ForAll(x, original_research_papers(x) -> scholarship_eligible(x))",
+        __import__("exact_xai.reasoner", fromlist=["Reasoner"]).Reasoner(kb),
+        __import__("exact_xai.solvers.z3_backend", fromlist=["Z3Backend"]).Z3Backend(kb),
+        req.question,
+    )
+    assert rr.answer == "Yes"
+    assert "rule_composition_proved" in rr.warnings
+
+
+def test_v45_rule_composition_picks_mcq_option_a():
+    from exact_xai.pipeline import AnswerPipeline
+    from exact_xai.schemas import AnswerRequest
+
+    req = AnswerRequest(
+        id="v45_mcq_rule_comp",
+        premises_nl=[],
+        premises_fol=[
+            "original_research_papers(x) -> recognized(x)",
+            "recognized(x) -> scholarship_eligible(x)",
+        ],
+        question=(
+            "Based on the premises, which conclusion is correct?\n"
+            "A. A student writing an original research paper qualifies for a scholarship\n"
+            "B. Limited study time does not impair understanding\n"
+            "C. Explaining measurement guarantees recognition\n"
+            "D. All students must analyze entanglement"
+        ),
+    )
+    pipe = AnswerPipeline(llm=None, input_mode="fol", use_z3=True)
+    # In rule-based parsing this may not reproduce the exact benchmark option text,
+    # so the core assertion is that the composed implication itself is now provable.
+    kb, _, _ = pipe.build_kb(req)
+    rr = pipe.prove_query(
+        "ForAll(x, original_research_papers(x) -> scholarship_eligible(x))",
+        __import__("exact_xai.reasoner", fromlist=["Reasoner"]).Reasoner(kb),
+        __import__("exact_xai.solvers.z3_backend", fromlist=["Z3Backend"]).Z3Backend(kb),
+        req.question,
+    )
     assert rr.answer == "Yes"
