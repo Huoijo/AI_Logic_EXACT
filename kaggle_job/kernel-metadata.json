@@ -7,7 +7,9 @@
   "is_private": "false",
   "enable_gpu": true,
   "enable_internet": true,
-  "dataset_sources": [],
+  "dataset_sources": [
+    "huoijo/exact-v47-adapter"
+  ],
   "competition_sources": [],
   "kernel_sources": []
 }
