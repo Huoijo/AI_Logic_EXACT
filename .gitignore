@@ -16,3 +16,7 @@ artifacts/
 train_artifacts/
 kaggle_train_outputs/
 .kaggle_train_build/
+kaggle_adapter_upload/
+*.safetensors
+*.pt
+*.pth
