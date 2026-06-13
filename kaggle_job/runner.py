@@ -1,4 +1,5 @@
 import os
+import shlex
 import shutil
 import subprocess
 from pathlib import Path
@@ -26,6 +27,10 @@ LEARNING_RATE = os.environ.get("LEARNING_RATE", "2e-4")
 USE_4BIT = os.environ.get("USE_4BIT", "1")
 MIN_CONFIDENCE = os.environ.get("MIN_CONFIDENCE", "0.0")
 
+# When ADAPTER_PATH is provided, fail immediately if Kaggle cannot see it.
+# Set STRICT_ADAPTER=0 only if you intentionally want to allow rule-based fallback.
+STRICT_ADAPTER = os.environ.get("STRICT_ADAPTER", "1")
+
 WORK_DIR = Path("/kaggle/working")
 REPO_DIR = WORK_DIR / "AI_Logic_EXACT"
 OUT_DIR = WORK_DIR / "outputs"
@@ -37,9 +42,58 @@ def run(cmd, cwd=None, env=None):
     subprocess.run(cmd, cwd=cwd, env=env, check=True)
 
 
-def run_shell(cmd, cwd=None):
+def run_shell(cmd, cwd=None, check=True):
     print("RUN:", cmd, flush=True)
-    subprocess.run(cmd, cwd=cwd, shell=True, check=True)
+    subprocess.run(cmd, cwd=cwd, shell=True, check=check)
+
+
+def resolve_adapter_path(raw_adapter_path: str) -> str:
+    """Resolve an adapter path that may be relative to the cloned repo or absolute under /kaggle/input."""
+    if not raw_adapter_path:
+        return ""
+
+    raw = Path(raw_adapter_path)
+    if raw.is_absolute():
+        return str(raw)
+
+    repo_relative = REPO_DIR / raw_adapter_path
+    if repo_relative.exists():
+        return str(repo_relative)
+
+    return raw_adapter_path
+
+
+def debug_and_validate_adapter(adapter_path: str) -> None:
+    """Print Kaggle input contents and validate LoRA adapter files before running benchmark."""
+    if not adapter_path:
+        print("[adapter] ADAPTER_PATH is empty; running without LoRA adapter.", flush=True)
+        return
+
+    q = shlex.quote(adapter_path)
+    print("===== DEBUG KAGGLE INPUT =====", flush=True)
+    run_shell("echo '--- /kaggle/input directories ---'; find /kaggle/input -maxdepth 3 -type d | sort | sed -n '1,200p' || true", check=False)
+    run_shell("echo '--- /kaggle/input files ---'; find /kaggle/input -maxdepth 5 -type f | sort | sed -n '1,200p' || true", check=False)
+
+    print("===== DEBUG ADAPTER PATH =====", flush=True)
+    print(f"[adapter] requested ADAPTER_PATH={ADAPTER_PATH}", flush=True)
+    print(f"[adapter] resolved  ADAPTER_PATH={adapter_path}", flush=True)
+    run_shell(f"ls -lah {q}", check=(STRICT_ADAPTER != "0"))
+
+    required_files = [
+        "adapter_config.json",
+        "adapter_model.safetensors",
+    ]
+    missing = [name for name in required_files if not (Path(adapter_path) / name).is_file()]
+    if missing:
+        message = (
+            f"Adapter path exists but is missing required files: {missing}. "
+            f"Expected files under: {adapter_path}"
+        )
+        if STRICT_ADAPTER != "0":
+            raise FileNotFoundError(message)
+        print(f"[warn] {message}", flush=True)
+    else:
+        print("[adapter] OK: adapter_config.json and adapter_model.safetensors found.", flush=True)
 
 
 def main():
@@ -48,6 +102,7 @@ def main():
     print(f"TASK={TASK}", flush=True)
     print(f"MODEL_NAME={MODEL_NAME}", flush=True)
     print(f"ADAPTER_PATH={ADAPTER_PATH}", flush=True)
+    print(f"STRICT_ADAPTER={STRICT_ADAPTER}", flush=True)
     print(f"INPUT_MODE={INPUT_MODE}", flush=True)
     print(f"DATASET={DATASET}", flush=True)
     print(f"BATCH_SIZE={BATCH_SIZE}", flush=True)
@@ -96,10 +151,13 @@ def main():
     env["LEARNING_RATE"] = LEARNING_RATE
     env["USE_4BIT"] = USE_4BIT
     env["MIN_CONFIDENCE"] = MIN_CONFIDENCE
+
     if ADAPTER_PATH:
-        # Adapter may be committed in repo or copied into Kaggle model/dataset later.
-        maybe_repo_adapter = REPO_DIR / ADAPTER_PATH
-        env["ADAPTER_PATH"] = str(maybe_repo_adapter if maybe_repo_adapter.exists() else ADAPTER_PATH)
+        resolved_adapter_path = resolve_adapter_path(ADAPTER_PATH)
+        debug_and_validate_adapter(resolved_adapter_path)
+        env["ADAPTER_PATH"] = resolved_adapter_path
+    else:
+        print("[adapter] No ADAPTER_PATH supplied.", flush=True)
 
     cmd = [
         "python", str(REPO_DIR / "scripts" / "kaggle_core_runner.py"),
