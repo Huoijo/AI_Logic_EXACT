@@ -6,23 +6,60 @@ import re
 
 from .schemas import AnswerRequest
 
-MCQ_ANSWER_RE = re.compile(r"^[A-Z]$")
-YESNO_SET = {"yes", "no", "uncertain"}
+MCQ_ANSWER_RE = re.compile(r"^[A-D]$", re.I)
+# EXACT datasets use both "Unknown" and "Uncertain" for the same
+# third truth value.  Keep them canonicalized for metrics/alignment.
+UNKNOWN_SET = {"unknown", "uncertain"}
+YESNO_SET = {"yes", "no"}
+# Support common MCQ spellings: A. ..., A) ..., A: ...
+CHOICE_LINE_RE = re.compile(r"(?m)^\s*([A-D])\s*[\.\):]\s+.+$")
 
 
 def infer_question_kind(question: str) -> str:
     q = question or ""
-    if re.search(r"(?m)^\s*[A-Z]\s*\.\s+", q):
+    labels = {m.group(1).upper() for m in CHOICE_LINE_RE.finditer(q)}
+    if {"A", "B"}.issubset(labels):
         return "multiple_choice"
     return "yes_no"
+
+
+def canonical_answer(value: Any) -> str | None:
+    """Canonicalize labels used by reports/metrics.
+
+    The benchmark data mixes "Unknown" and "Uncertain".  The solver emits
+    "Uncertain", while some gold labels use "Unknown"; they are equivalent.
+    """
+    if value is None:
+        return None
+    s = str(value).strip()
+    low = s.lower()
+    if low in UNKNOWN_SET:
+        return "uncertain"
+    if low in YESNO_SET:
+        return low
+    if MCQ_ANSWER_RE.match(s):
+        return s.upper()
+    return low
+
+
+def answers_equivalent(pred: Any, gold: Any) -> bool:
+    if gold is None:
+        return False
+    return canonical_answer(pred) == canonical_answer(gold)
 
 
 def infer_answer_kind(answer: Any) -> str:
     if answer is None:
         return "unknown"
     s = str(answer).strip()
-    if s.lower() in YESNO_SET:
+    low = s.lower()
+    if low in YESNO_SET:
         return "yes_no"
+    if low in UNKNOWN_SET:
+        # Unknown/Uncertain can be the correct non-provable answer for either
+        # Yes/No or MCQ records, so alignment treats it as compatible with the
+        # same-position question instead of as an "open" answer.
+        return "unknown"
     if MCQ_ANSWER_RE.match(s):
         return "multiple_choice"
     return "open"
@@ -65,11 +102,15 @@ def align_answers_to_questions(questions: list[str], answers: list[Any]) -> tupl
     for i, q in enumerate(questions):
         qkind = infer_question_kind(q)
 
-        # Prefer same position if type matches.
-        if i < len(answers) and i not in used and infer_answer_kind(answers[i]) == qkind:
-            aligned.append(answers[i])
-            used.add(i)
-            continue
+        # Prefer same position if type matches.  Unknown/Uncertain is allowed
+        # for either MCQ or Yes/No because generated EXACT records use it as
+        # the third truth value / no-provable-option marker.
+        if i < len(answers) and i not in used:
+            same_kind = infer_answer_kind(answers[i])
+            if same_kind == qkind or same_kind == "unknown":
+                aligned.append(answers[i])
+                used.add(i)
+                continue
 
         # Search another unused answer with the matching type.
         found = None

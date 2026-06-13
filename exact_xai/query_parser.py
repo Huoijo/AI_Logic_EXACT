@@ -10,8 +10,8 @@ from .fol import Atom, KnowledgeBase, parse_atom
 from .fol_repair import repair_fol_string, normalize_predicate_name, collapse_repeated_suffixes
 from .schemas import ParsedQuestion
 
-# Match EXACT-style MCQ options of the form A. ... B. ... C. ... D. ...
-CHOICE_RE = re.compile(r"(?m)^\s*([A-D])\.\s*(.+?)(?=\n\s*[A-D]\.\s*|\Z)", re.S)
+# Match EXACT-style MCQ options of the form A. ... / A) ... / A: ...
+CHOICE_RE = re.compile(r"(?m)^\s*([A-D])\s*[\.\):]\s*(.+?)(?=\n\s*[A-D]\s*[\.\):]\s*|\Z)", re.S)
 YES_NO_STARTERS = (
     "does ", "do ", "is ", "are ", "can ", "could ",
     "should ", "would ", "will ", "did ", "has ", "have ",

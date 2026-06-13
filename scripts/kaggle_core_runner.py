@@ -20,7 +20,7 @@ from exact_xai.llm_qwen import maybe_load_qwen
 from exact_xai.fol import parse_fol_premises, parse_atom
 from exact_xai.reasoner import Reasoner
 from exact_xai.explanation import proof_to_explanation
-from exact_xai.dataset_utils import records_from_exact_dataset, infer_question_kind
+from exact_xai.dataset_utils import records_from_exact_dataset, infer_question_kind, answers_equivalent
 
 
 def fmt_seconds(seconds: float) -> str:
@@ -106,9 +106,7 @@ def run_unit_smoke(out: Path):
 
 
 def _is_correct(pred, gold) -> bool:
-    if gold is None:
-        return False
-    return str(pred).strip().lower() == str(gold).strip().lower()
+    return answers_equivalent(pred, gold)
 
 
 def save_readable_qa_report(records: list[AnswerRequest], results: list[dict], out_path: Path) -> None:
